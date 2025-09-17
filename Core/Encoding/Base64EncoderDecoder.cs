@@ -21,8 +21,21 @@ namespace VisionNet.Core.Encoding
         /// <returns> A string.</returns>
         public string Encode(string source)
         {
+            // GUARD: Ensure the source string is present before encoding.
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            string trimmedSource = source.Trim();
+
+            if (trimmedSource.Length == 0)
+            {
+                throw new ArgumentException("Source string must not be empty or whitespace.", nameof(source));
+            }
+
             string result = string.Empty;
-            byte[] encryted = System.Text.Encoding.ASCII.GetBytes(source);
+            byte[] encryted = System.Text.Encoding.ASCII.GetBytes(trimmedSource);
             result = Convert.ToBase64String(encryted);
             return result;
         }
@@ -33,10 +46,30 @@ namespace VisionNet.Core.Encoding
         /// <returns> A string</returns>
         public string Decode(string source)
         {
-            string result = string.Empty;
-            byte[] decryted = Convert.FromBase64String(source);
-            result = System.Text.Encoding.ASCII.GetString(decryted);
-            return result;
+            // GUARD: Ensure the source string is present before decoding.
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            string trimmedSource = source.Trim();
+
+            if (trimmedSource.Length == 0)
+            {
+                throw new ArgumentException("Source string must not be empty or whitespace.", nameof(source));
+            }
+
+            try
+            {
+                string result = string.Empty;
+                byte[] decryted = Convert.FromBase64String(trimmedSource);
+                result = System.Text.Encoding.ASCII.GetString(decryted);
+                return result;
+            }
+            catch (FormatException ex)
+            {
+                throw new ArgumentException("Source string is not a valid Base64 value.", nameof(source), ex);
+            }
         }
     }
 }
