@@ -41,9 +41,9 @@ namespace VisionNet.Core.Maths
             Count = count;
         }
 
-        /// <summary> The CompareTo function compares two objects of the same type and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>
-        /// <param name="obj"> What is this parameter used for?</param>
-        /// <returns> The difference between the count of this object and the count of obj.</returns>
+        /// <summary>Compares this instance with another object, treating <c>null</c> or non-<see cref="ValueCountTuple"/> instances as lesser values.</summary>
+        /// <param name="obj">The object to compare with this instance.</param>
+        /// <returns>A signed integer that indicates the relative order of the objects being compared.</returns>
         public int CompareTo(object obj)
         {
             if (ReferenceEquals(this, obj)) return 0;
