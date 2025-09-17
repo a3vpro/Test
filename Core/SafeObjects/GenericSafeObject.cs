@@ -14,11 +14,20 @@ using VisionNet.Core.Exceptions;
 
 namespace VisionNet.Core.SafeObjects
 {
+    /// <summary>
+    /// Provides a thread-safe container for a single value that is validated against a declared <see cref="DataType" />
+    /// type, ensuring only compatible objects are stored and retrieved safely.
+    /// </summary>
     public class GenericSafeObject : ISafeObject<Type>
     {
         protected object _lockObject = new object();
         protected object _value;
 
+        /// <summary>
+        /// Gets the runtime <see cref="Type" /> that any stored value must be assignable to in order to be accepted by the
+        /// safe object.
+        /// </summary>
+        /// <value>The expected <see cref="Type" /> for validated values; defaults to <see cref="object" />.</value>
         public Type DataType { get; protected set; }
 
         
