@@ -9,6 +9,12 @@ namespace VisionNet.Core.RegularExpressions
     {
         public static bool IsValidRegex(string pattern)
         {
+            // GUARD: Ensure the pattern argument is not null before attempting to construct the regex.
+            if (pattern is null)
+            {
+                throw new ArgumentNullException(nameof(pattern));
+            }
+
             try
             {
                 var regex = new Regex(pattern);
