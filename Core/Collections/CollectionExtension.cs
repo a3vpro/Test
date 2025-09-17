@@ -222,6 +222,14 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the specified sequence contains a particular value by using the default equality comparer.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the sequence.</typeparam>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, a <see cref="NullReferenceException"/> is thrown.</param>
+        /// <param name="value">The value to locate in the sequence. The value may be <see langword="null"/> for reference types.</param>
+        /// <returns><see langword="true"/> if the value is found in the sequence; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="NullReferenceException">The <paramref name="sequence"/> parameter is <see langword="null"/>.</exception>
         public static bool Contains<T>(this IEnumerable<T> sequence, T value)
         {
             IEqualityComparer<T> @default = EqualityComparer<T>.Default;
@@ -236,6 +244,14 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the specified non-generic sequence contains a particular value by using <see cref="System.Collections.Generic.Comparer{object}.Default"/>.
+        /// </summary>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, a <see cref="NullReferenceException"/> is thrown.</param>
+        /// <param name="value">The value to locate in the sequence. The value may be <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if the value is found in the sequence; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="NullReferenceException">The <paramref name="sequence"/> parameter is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The comparer cannot determine an ordering for <paramref name="value"/> and the elements of <paramref name="sequence"/>.</exception>
         public static bool Contains(this IEnumerable sequence, object value)
         {
             Comparer<object> @default = Comparer<object>.Default;
@@ -250,6 +266,13 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains any of the specified values by using the default equality comparer.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the sequences.</typeparam>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, the method returns <see langword="false"/>.</param>
+        /// <param name="values">The values to locate in the sequence. If this value is <see langword="null"/> or empty, the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if any value from <paramref name="values"/> is present in <paramref name="sequence"/>; otherwise, <see langword="false"/>.</returns>
         public static bool ContainsAny<T>(this IEnumerable<T> sequence, IEnumerable<T> values)
         {
             if (IsSequenceNullOrEmpty(values))
@@ -282,6 +305,12 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains any of the specified values by using the default equality comparer for <see cref="object"/>.
+        /// </summary>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, the method returns <see langword="false"/>.</param>
+        /// <param name="values">The values to locate in the sequence. If this value is <see langword="null"/> or empty, the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if any value from <paramref name="values"/> is present in <paramref name="sequence"/>; otherwise, <see langword="false"/>.</returns>
         public static bool ContainsAny(this IEnumerable sequence, IEnumerable values)
         {
             if (IsSequenceNullOrEmpty(values))
@@ -314,6 +343,13 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains all the specified values by using the default equality comparer.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the sequences.</typeparam>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, the method returns <see langword="false"/>.</param>
+        /// <param name="values">The values to locate in the sequence. If this value is <see langword="null"/> or empty, the method returns <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if every value from <paramref name="values"/> is present in <paramref name="sequence"/>; otherwise, <see langword="false"/>.</returns>
         public static bool ContainsAll<T>(this IEnumerable<T> sequence, IEnumerable<T> values)
         {
             if (IsSequenceNullOrEmpty(values))
@@ -346,6 +382,12 @@ namespace VisionNet.Core.Collections
             return true;
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains all the specified values by using the default equality comparer for <see cref="object"/>.
+        /// </summary>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, the method returns <see langword="false"/>.</param>
+        /// <param name="values">The values to locate in the sequence. If this value is <see langword="null"/> or empty, the method returns <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> if every value from <paramref name="values"/> is present in <paramref name="sequence"/>; otherwise, <see langword="false"/>.</returns>
         public static bool ContainsAll(this IEnumerable sequence, IEnumerable values)
         {
             if (IsSequenceNullOrEmpty(values))
@@ -378,6 +420,12 @@ namespace VisionNet.Core.Collections
             return true;
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains exactly the specified number of elements.
+        /// </summary>
+        /// <param name="sequence">The sequence to evaluate. This value may be <see langword="null"/>.</param>
+        /// <param name="numberOfElements">The number of elements to compare against.</param>
+        /// <returns><see langword="true"/> if the sequence contains exactly <paramref name="numberOfElements"/> elements; otherwise, <see langword="false"/>.</returns>
         public static bool SequenceHasLength(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -416,6 +464,12 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified sequence is <see langword="null"/> or contains no elements.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="sequence">The sequence to test. This value may be <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if the sequence is <see langword="null"/> or empty; otherwise, <see langword="false"/>.</returns>
         public static bool IsSequenceNullOrEmpty<TSource>(this IEnumerable<TSource> sequence)
         {
             if (sequence == null)
@@ -432,6 +486,11 @@ namespace VisionNet.Core.Collections
             return IsSequenceNullOrEmpty((IEnumerable)sequence);
         }
 
+        /// <summary>
+        /// Determines whether the specified non-generic sequence is <see langword="null"/> or contains no elements.
+        /// </summary>
+        /// <param name="sequence">The sequence to test. This value may be <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if the sequence is <see langword="null"/> or empty; otherwise, <see langword="false"/>.</returns>
         public static bool IsSequenceNullOrEmpty(this IEnumerable sequence)
         {
             if (sequence == null)
@@ -448,6 +507,12 @@ namespace VisionNet.Core.Collections
             return IsEnumerableEmpty(sequence);
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains fewer elements than the specified count.
+        /// </summary>
+        /// <param name="sequence">The sequence to evaluate. This value may be <see langword="null"/>.</param>
+        /// <param name="numberOfElements">The number of elements to compare against.</param>
+        /// <returns><see langword="true"/> if the sequence contains fewer than <paramref name="numberOfElements"/> elements; otherwise, <see langword="false"/>.</returns>
         public static bool SequenceIsShorterThan(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -486,6 +551,12 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains fewer than or exactly the specified number of elements.
+        /// </summary>
+        /// <param name="sequence">The sequence to evaluate. This value may be <see langword="null"/>.</param>
+        /// <param name="numberOfElements">The number of elements to compare against.</param>
+        /// <returns><see langword="true"/> if the sequence contains at most <paramref name="numberOfElements"/> elements; otherwise, <see langword="false"/>.</returns>
         public static bool SequenceIsShorterOrEqual(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -524,6 +595,12 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains more elements than the specified count.
+        /// </summary>
+        /// <param name="sequence">The sequence to evaluate. This value may be <see langword="null"/>.</param>
+        /// <param name="numberOfElements">The number of elements to compare against.</param>
+        /// <returns><see langword="true"/> if the sequence contains more than <paramref name="numberOfElements"/> elements; otherwise, <see langword="false"/>.</returns>
         public static bool SequenceIsLongerThan(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -562,6 +639,12 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains at least the specified number of elements.
+        /// </summary>
+        /// <param name="sequence">The sequence to evaluate. This value may be <see langword="null"/>.</param>
+        /// <param name="numberOfElements">The number of elements to compare against.</param>
+        /// <returns><see langword="true"/> if the sequence contains at least <paramref name="numberOfElements"/> elements; otherwise, <see langword="false"/>.</returns>
         public static bool SequenceIsLongerOrEqual(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -600,6 +683,12 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Returns the number of elements in the sequence, iterating the entire sequence if necessary.
+        /// </summary>
+        /// <param name="sequence">The sequence to evaluate. If this value is <see langword="null"/>, a <see cref="NullReferenceException"/> is thrown.</param>
+        /// <returns>The number of elements in the sequence.</returns>
+        /// <exception cref="NullReferenceException">The <paramref name="sequence"/> parameter is <see langword="null"/>.</exception>
         public static int GetLength(this IEnumerable sequence)
         {
             ICollection collection = sequence as ICollection;
