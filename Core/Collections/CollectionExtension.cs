@@ -30,6 +30,13 @@ namespace VisionNet.Core.Collections
         /// <returns>The index of the found item, or -1 if not found.</returns>
         public static int FindIndex<T>(this IEnumerable<T> items, Predicate<T> predicate)
         {
+            // GUARD: Ensure required arguments are provided.
+            if (items is null)
+                throw new ArgumentNullException(nameof(items));
+
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+
             bool found = false;
             int index = 0;
             foreach (var item in items)
