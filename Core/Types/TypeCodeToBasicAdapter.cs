@@ -16,6 +16,12 @@ namespace VisionNet.Core.Types
 {
     public class TypeCodeToBasicAdapter : IBidirectionalAdapter<TypeCode, BasicTypeCode>
     {
+        /// <summary>
+        /// Converts the provided <see cref="TypeCode"/> to the corresponding <see cref="BasicTypeCode"/> supported by the adapter.
+        /// </summary>
+        /// <param name="value">The .NET <see cref="TypeCode"/> to convert. Integral, floating-point, string, boolean, date/time, and object type codes are recognized.</param>
+        /// <returns>The matching <see cref="BasicTypeCode"/> enumeration value; returns <see cref="BasicTypeCode.NotSupported"/> when the supplied type code is not recognized.</returns>
+        /// <remarks>This method does not throw exceptions.</remarks>
         public BasicTypeCode Convert(TypeCode value)
         {
             var result = BasicTypeCode.NotSupported;
@@ -64,6 +70,12 @@ namespace VisionNet.Core.Types
             }
         }
 
+        /// <summary>
+        /// Converts the provided <see cref="BasicTypeCode"/> to the corresponding <see cref="TypeCode"/> supported by the adapter.
+        /// </summary>
+        /// <param name="value">The <see cref="BasicTypeCode"/> to convert. IntegerNumber, FloatingPointNumber, String, Boolean, DateTime, Object, Image, and Graphic values are supported.</param>
+        /// <returns>The matching <see cref="TypeCode"/> enumeration value; returns <see cref="TypeCode.Empty"/> when the supplied type is not recognized or represents <see cref="BasicTypeCode.NotSupported"/>.</returns>
+        /// <remarks>This method does not throw exceptions.</remarks>
         public TypeCode Convert(BasicTypeCode value)
         {
             var result = TypeCode.Empty;
