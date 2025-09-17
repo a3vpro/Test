@@ -6,12 +6,50 @@ using VisionNet.Core.Dawing;
 
 namespace VisionNet.Core.AI
 {
+    /// <summary>
+    /// Provides a simplified implementation of the HDBSCAN clustering algorithm for two-dimensional points
+    /// associated with contextual metadata. The clustering process groups points into stable clusters based on
+    /// mutual reachability distances and a configurable minimum cluster size.
+    /// </summary>
+    /// <typeparam name="T">The type of contextual information that accompanies each clustered point.</typeparam>
     public class HDBSCANClustering<T>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HDBSCANClustering{T}"/> class with default configuration
+        /// values. The <see cref="Points"/> collection is initially empty and <see cref="MinClusterSize"/> is set to five.
+        /// </summary>
+        public HDBSCANClustering()
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets the collection of points to be clustered. Each entry must contain a valid point and associated
+        /// context, and the collection must not be <see langword="null"/> when <see cref="Execute"/> is invoked.
+        /// </summary>
+        /// <value>A mutable list of points that will be grouped into clusters.</value>
         public List<PointFWithContext<T>> Points { get; set; } = new List<PointFWithContext<T>>();
+
+        /// <summary>
+        /// Gets or sets the minimum number of points required to form a cluster. The value must be greater than zero
+        /// and should not exceed the number of available points to avoid degenerate results.
+        /// </summary>
+        /// <value>The cluster size threshold used when condensing the hierarchy.</value>
         public int MinClusterSize { get; set; } = 5;
+
+        /// <summary>
+        /// Gets the collection of clusters detected during the most recent execution. The property remains
+        /// <see langword="null"/> until <see cref="Execute"/> completes successfully.
+        /// </summary>
+        /// <value>A list containing the stable clusters extracted from the condensed hierarchy, or <see langword="null"/> if clustering has not been executed.</value>
         public List<List<PointFWithContext<T>>> Clusters { get; private set; }
 
+        /// <summary>
+        /// Performs the HDBSCAN clustering workflow on the configured <see cref="Points"/>, producing clusters that
+        /// satisfy the <see cref="MinClusterSize"/> constraint. The method builds mutual reachability distances,
+        /// constructs a minimum spanning tree, derives the cluster hierarchy, and extracts stable clusters.
+        /// </summary>
+        /// <exception cref="NullReferenceException">Thrown when <see cref="Points"/> is <see langword="null"/>, as the algorithm requires access to the point collection.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown when <see cref="Points"/> is empty or when <see cref="MinClusterSize"/> is configured to a value less than one, producing invalid index lookups during tree construction or core distance evaluation.</exception>
         public void Execute()
         {
             int n = Points.Count;
