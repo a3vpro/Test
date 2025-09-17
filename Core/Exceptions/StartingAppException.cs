@@ -15,45 +15,56 @@ using System.Security;
 
 namespace VisionNet.Core.Exceptions
 {
+    /// <summary>
+    /// Represents errors encountered while starting the VisionNet application that prevent the host from completing its startup
+    /// sequence.
+    /// </summary>
+    /// <remarks>
+    /// Throw this exception when a required service, configuration value, or dependency fails during application bootstrap in a
+    /// way that stops the application from becoming operational.
+    /// </remarks>
     public class StartingAppException : Exception
     {
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException.
+        /// Initializes a new instance of the <see cref="StartingAppException"/> class with a default message describing a
+        /// startup failure.
         /// </summary>
         public StartingAppException() { }
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException con el mensaje de error especificado.
+        /// Initializes a new instance of the <see cref="StartingAppException"/> class with a specific error message that explains
+        /// the reason the application startup failed.
         /// </summary>
-        /// <param name="message">Mensaje que describe el error</param>
+        /// <param name="message">
+        /// A human-readable description of the startup failure. Provide actionable context such as the missing configuration key
+        /// or failing dependency.
+        /// </param>
         public StartingAppException(string message) : base(message) { }
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException con el mensaje de
-        /// error especificado y una referencia a la excepción interna que representa la
-        /// causa de esta excepción.
+        /// Initializes a new instance of the <see cref="StartingAppException"/> class with a specified error message and a
+        /// reference to the inner exception that caused the startup failure.
         /// </summary>
-        /// <param name="message">Mensaje de error que explica el motivo de la excepción.</param>
+        /// <param name="message">
+        /// A description of the startup error. The message should clarify why the application could not complete initialization.
+        /// </param>
         /// <param name="innerException">
-        /// Inicializa una nueva instancia de la clase System.Exception con el mensaje de
-        /// error especificado y una referencia a la excepción interna que representa la
-        /// causa de esta excepción.
+        /// The exception that triggered the startup failure. Use this to preserve the original stack trace and error details.
         /// </param>
         public StartingAppException(string message, Exception innerException) : base(message, innerException) { }
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException con datos serializados.
+        /// Initializes a new instance of the <see cref="StartingAppException"/> class with serialized data.
         /// </summary>
         /// <param name="info">
-        /// System.Runtime.Serialization.SerializationInfo que contiene los datos serializados
-        /// del objeto que hacen referencia a la excepción que se va a producir.
+        /// The <see cref="SerializationInfo"/> instance that stores the serialized exception data, including the startup error
+        /// message and any inner exception details.
         /// </param>
         /// <param name="context">
-        /// System.Runtime.Serialization.StreamingContext que contiene información contextual
-        /// sobre el origen o el destino.
+        /// The <see cref="StreamingContext"/> structure that describes the source or destination for the serialization operation.
         /// </param>
-        /// <exception cref="T:System.ArgumentNullException">The info parameter is null.</exception>  
-        /// <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or System.Exception.HResult is zero (0).</exception>  
+        /// <exception cref="ArgumentNullException"><paramref name="info"/> is <see langword="null"/>.</exception>
+        /// <exception cref="SerializationException">The class name is <see langword="null"/> or the <see cref="Exception.HResult"/> value is zero.</exception>
         [SecuritySafeCritical]
         protected StartingAppException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
