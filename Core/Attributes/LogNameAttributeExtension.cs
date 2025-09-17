@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace VisionNet.Logging
 {
@@ -11,6 +12,11 @@ namespace VisionNet.Logging
         /// <returns> The value of the logname property in the lognameattribute class</returns>
         public static string GetLogName(this object obj)
         {
+            if (obj is null)
+            {
+                // GUARD: Prevent null dereference when retrieving the object's log name attribute.
+                throw new ArgumentNullException(nameof(obj));
+            }
 
             var attribute = obj.GetType()
                 .GetCustomAttributes(true)
