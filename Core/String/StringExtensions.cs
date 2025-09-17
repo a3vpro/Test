@@ -172,16 +172,38 @@ namespace VisionNet.Core.Strings
         /// <returns> A string with the specified suffix removed from the end.</returns>
         public static string RemoveFromStart(this string str, params string[] toRemove)
         {
+            if (str == null)
+            {
+                // GUARD: Prevent null dereference when processing prefixes.
+                return null;
+            }
+            if (toRemove == null || toRemove.Length == 0)
+            {
+                // GUARD: Nothing to remove when no prefixes are provided.
+                return str;
+            }
             var result = str;
 
             foreach (var sufix in toRemove)
+            {
+                if (sufix == null)
+                {
+                    // GUARD: Skip null prefixes.
+                    continue;
+                }
                 result = result._removeFromStart(sufix);
+            }
 
             return result;
         }
 
         private static string _removeFromStart(this string str, string toRemove)
         {
+            if (str == null)
+            {
+                // GUARD: Preserve null input without dereferencing.
+                return null;
+            }
             if (str.StartsWith(toRemove))
                 return str.Substring(toRemove.Length);
             else
@@ -194,16 +216,38 @@ namespace VisionNet.Core.Strings
         /// <returns> A string with the specified suffix removed from the end.</returns>
         public static string RemoveFromEnd(this string str, params string[] toRemove)
         {
+            if (str == null)
+            {
+                // GUARD: Prevent null dereference when processing suffixes.
+                return null;
+            }
+            if (toRemove == null || toRemove.Length == 0)
+            {
+                // GUARD: Nothing to remove when no suffixes are provided.
+                return str;
+            }
             var result = str;
 
             foreach (var sufix in toRemove)
+            {
+                if (sufix == null)
+                {
+                    // GUARD: Skip null suffixes.
+                    continue;
+                }
                 result = result._removeFromEnd(sufix);
+            }
 
             return result;
         }
 
         private static string _removeFromEnd(this string str, string toRemove)
         {
+            if (str == null)
+            {
+                // GUARD: Preserve null input without dereferencing.
+                return null;
+            }
             if (str.EndsWith(toRemove))
                 return str.Substring(0, str.Length - toRemove.Length);
             else
@@ -217,6 +261,11 @@ namespace VisionNet.Core.Strings
         /// <returns> A string without diacritics.</returns>
         public static string RemoveDiacritics(this string text)
         {
+            if (text == null)
+            {
+                // GUARD: Preserve null input while avoiding normalization on null.
+                return null;
+            }
             return string.Concat(text.Normalize(NormalizationForm.FormD)
                 .Where(ch => CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark))
                 .Normalize(NormalizationForm.FormC);
@@ -224,6 +273,11 @@ namespace VisionNet.Core.Strings
 
         public static string RemoveNonAlphanumericCharacters(this string text)
         {
+            if (text == null)
+            {
+                // GUARD: Preserve null input without invoking regular expressions.
+                return null;
+            }
             // Elimina cualquier caracter que no sea alfanumérico o espacio
             text = Regex.Replace(text, @"[^\w\s]", " ");
 
@@ -235,6 +289,11 @@ namespace VisionNet.Core.Strings
 
         public static string NormalizeVisualAmbiguities(this string text)
         {
+            if (text == null)
+            {
+                // GUARD: Preserve null input while avoiding replacements on null.
+                return null;
+            }
             // Normaliza los espacios en blanco primero
             string normalizedText = text;
 
@@ -259,6 +318,11 @@ namespace VisionNet.Core.Strings
 
         public static string NormalizeSeparatorsCharacters(this string text)
         {
+            if (text == null)
+            {
+                // GUARD: Preserve null input without invoking regular expressions.
+                return null;
+            }
             // Colapsa cualquier secuencia de espacios en blanco (espacios, tabulaciones, saltos de línea) a un único espacio
             text = Regex.Replace(text, @"\s+", " ");
 
@@ -268,6 +332,11 @@ namespace VisionNet.Core.Strings
 
         public static string RemoveSeparatorsCharacters(this string text)
         {
+            if (text == null)
+            {
+                // GUARD: Preserve null input without invoking regular expressions.
+                return null;
+            }
             // Colapsa cualquier secuencia de espacios en blanco (espacios, tabulaciones, saltos de línea) a un único espacio
             text = Regex.Replace(text, @"\s+", "");
 
@@ -299,6 +368,16 @@ namespace VisionNet.Core.Strings
         /// <returns> True if the two strings are equal, false otherwise.</returns>
         public static bool EqualsEx(this string compared1, string compared2, StringComparisonEx comparisonType)
         {
+            if (ReferenceEquals(compared1, compared2))
+            {
+                // GUARD: Identical references (including both null) are always equal.
+                return true;
+            }
+            if (compared1 == null || compared2 == null)
+            {
+                // GUARD: Ensure symmetric null handling before invoking instance comparisons.
+                return false;
+            }
             var ct = comparisonType.Convert();
 
             var valueCompared1 = compared1;
