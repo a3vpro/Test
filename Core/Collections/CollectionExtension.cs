@@ -314,6 +314,29 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> supplies every element required by <paramref name="values"/>.
+        /// Handles <see langword="null"/> or empty <paramref name="values"/> as trivially satisfied and treats a
+        /// <see langword="null"/> <paramref name="sequence"/> as empty.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the sequences.</typeparam>
+        /// <param name="sequence">
+        /// The source sequence to inspect; may be <see langword="null"/>, in which case the method returns
+        /// <see langword="false"/> unless <paramref name="values"/> is <see langword="null"/> or empty.
+        /// </param>
+        /// <param name="values">
+        /// The values that must be present; may be <see langword="null"/> or empty, which immediately yields
+        /// <see langword="true"/>. <see langword="null"/> entries require the source sequence to contain at least one
+        /// <see langword="null"/> item.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when every value (respecting <see langword="null"/> semantics) exists in
+        /// <paramref name="sequence"/>; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> or <paramref name="values"/> is
+        /// propagated to the caller.
+        /// </exception>
         public static bool ContainsAll<T>(this IEnumerable<T> sequence, IEnumerable<T> values)
         {
             if (IsSequenceNullOrEmpty(values))
@@ -346,6 +369,29 @@ namespace VisionNet.Core.Collections
             return true;
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> supplies every element required by <paramref name="values"/>,
+        /// using non-generic comparisons.
+        /// Handles <see langword="null"/> or empty <paramref name="values"/> as trivially satisfied and treats a
+        /// <see langword="null"/> <paramref name="sequence"/> as empty.
+        /// </summary>
+        /// <param name="sequence">
+        /// The source sequence to inspect; may be <see langword="null"/>, in which case the method returns
+        /// <see langword="false"/> unless <paramref name="values"/> is <see langword="null"/> or empty.
+        /// </param>
+        /// <param name="values">
+        /// The values that must be present; may be <see langword="null"/> or empty, which immediately yields
+        /// <see langword="true"/>. <see langword="null"/> entries require the source sequence to contain at least one
+        /// <see langword="null"/> item.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when every value (respecting <see langword="null"/> semantics) exists in
+        /// <paramref name="sequence"/>; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> or <paramref name="values"/> is
+        /// propagated to the caller.
+        /// </exception>
         public static bool ContainsAll(this IEnumerable sequence, IEnumerable values)
         {
             if (IsSequenceNullOrEmpty(values))
@@ -378,6 +424,22 @@ namespace VisionNet.Core.Collections
             return true;
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> exposes exactly <paramref name="numberOfElements"/> items,
+        /// treating a <see langword="null"/> sequence as empty.
+        /// </summary>
+        /// <param name="sequence">
+        /// The sequence to inspect; may be <see langword="null"/>, which is treated as having zero elements. Non-null
+        /// sequences are fully enumerated when they do not implement <see cref="ICollection"/>.
+        /// </param>
+        /// <param name="numberOfElements">The expected length to compare against. Negative values are permitted.</param>
+        /// <returns>
+        /// <see langword="true"/> when the sequence has exactly <paramref name="numberOfElements"/> items; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static bool SequenceHasLength(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -416,6 +478,21 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> is <see langword="null"/> or exposes no elements.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="sequence">
+        /// The sequence to inspect; may be <see langword="null"/>. When the sequence does not implement
+        /// <see cref="ICollection{T}"/>, it is enumerated once.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when <paramref name="sequence"/> is <see langword="null"/> or has no items;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static bool IsSequenceNullOrEmpty<TSource>(this IEnumerable<TSource> sequence)
         {
             if (sequence == null)
@@ -432,6 +509,20 @@ namespace VisionNet.Core.Collections
             return IsSequenceNullOrEmpty((IEnumerable)sequence);
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> is <see langword="null"/> or exposes no elements.
+        /// </summary>
+        /// <param name="sequence">
+        /// The sequence to inspect; may be <see langword="null"/>. When the sequence does not implement
+        /// <see cref="ICollection"/>, it is enumerated once.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when <paramref name="sequence"/> is <see langword="null"/> or has no items;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static bool IsSequenceNullOrEmpty(this IEnumerable sequence)
         {
             if (sequence == null)
@@ -448,6 +539,22 @@ namespace VisionNet.Core.Collections
             return IsEnumerableEmpty(sequence);
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> contains fewer elements than the specified count, treating a
+        /// <see langword="null"/> sequence as empty.
+        /// </summary>
+        /// <param name="sequence">
+        /// The sequence to inspect; may be <see langword="null"/>, which is treated as having zero elements. Non-null
+        /// sequences are partially enumerated until the outcome is known.
+        /// </param>
+        /// <param name="numberOfElements">The comparison length. Negative values are permitted.</param>
+        /// <returns>
+        /// <see langword="true"/> when the sequence is shorter than <paramref name="numberOfElements"/>; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static bool SequenceIsShorterThan(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -486,6 +593,22 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> contains no more than the specified number of elements,
+        /// treating a <see langword="null"/> sequence as empty.
+        /// </summary>
+        /// <param name="sequence">
+        /// The sequence to inspect; may be <see langword="null"/>, which is treated as having zero elements. Non-null
+        /// sequences are partially enumerated until the outcome is known.
+        /// </param>
+        /// <param name="numberOfElements">The comparison length. Negative values are permitted.</param>
+        /// <returns>
+        /// <see langword="true"/> when the sequence is shorter than or equal to <paramref name="numberOfElements"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static bool SequenceIsShorterOrEqual(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -524,6 +647,22 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> contains more elements than the specified count, treating a
+        /// <see langword="null"/> sequence as empty.
+        /// </summary>
+        /// <param name="sequence">
+        /// The sequence to inspect; may be <see langword="null"/>, which is treated as having zero elements. Non-null
+        /// sequences are partially enumerated until the outcome is known.
+        /// </param>
+        /// <param name="numberOfElements">The comparison length. Negative values are permitted.</param>
+        /// <returns>
+        /// <see langword="true"/> when the sequence is longer than <paramref name="numberOfElements"/>; otherwise,
+        /// <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static bool SequenceIsLongerThan(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -562,6 +701,22 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="sequence"/> contains at least the specified number of elements, treating a
+        /// <see langword="null"/> sequence as empty.
+        /// </summary>
+        /// <param name="sequence">
+        /// The sequence to inspect; may be <see langword="null"/>, which is treated as having zero elements. Non-null
+        /// sequences are partially enumerated until the outcome is known.
+        /// </param>
+        /// <param name="numberOfElements">The comparison length. Negative values are permitted.</param>
+        /// <returns>
+        /// <see langword="true"/> when the sequence is longer than or equal to <paramref name="numberOfElements"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static bool SequenceIsLongerOrEqual(this IEnumerable sequence, int numberOfElements)
         {
             if (sequence == null)
@@ -600,6 +755,21 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Calculates the number of elements exposed by <paramref name="sequence"/>.
+        /// </summary>
+        /// <param name="sequence">
+        /// The sequence to inspect. The value must not be <see langword="null"/> because the implementation directly
+        /// obtains an enumerator when <see cref="ICollection"/> is not implemented.
+        /// </param>
+        /// <returns>The total number of items yielded by <paramref name="sequence"/>.</returns>
+        /// <exception cref="NullReferenceException">
+        /// Thrown when <paramref name="sequence"/> is <see langword="null"/>, because the implementation calls
+        /// <see cref="IEnumerable.GetEnumerator"/> without a prior <see langword="null"/> guard.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Any exception thrown while enumerating <paramref name="sequence"/> is propagated to the caller.
+        /// </exception>
         public static int GetLength(this IEnumerable sequence)
         {
             ICollection collection = sequence as ICollection;
