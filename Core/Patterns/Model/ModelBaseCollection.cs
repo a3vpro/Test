@@ -17,24 +17,41 @@ using System.Linq;
 
 namespace VisionNet.Core.Patterns
 {
+    /// <summary>
+    /// Provides a base observable collection that materializes view-model wrappers from a domain collection while
+    /// maintaining access to the underlying domain objects.
+    /// </summary>
+    /// <typeparam name="TVM">Type of the view-model wrapper that exposes the domain object.</typeparam>
+    /// <typeparam name="TDm">Type of the domain model instances contained in the collection.</typeparam>
     public abstract class ModelBaseCollection<TVM, TDm> : ObservableCollection<TVM>
     {
         #region Fields
+        /// <summary>
+        /// Backing storage for the exposed domain objects; kept in sync with <see cref="DomainCollection"/> so callers can
+        /// inspect the underlying domain instances that generated the view-model items.
+        /// </summary>
         public List<TDm> _mDomainCollection;
         #endregion
 
         #region Constructor
-        
-        /// <summary> The ModelBaseCollection function is a constructor that initializes the ModelBaseCollection class.</summary>
-        /// <returns> A new instance of the modelbasecollection class.</returns>
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelBaseCollection{TVM, TDm}"/> class without pre-populating
+        /// domain or view-model elements.
+        /// </summary>
         protected ModelBaseCollection()
         {
         }
 
-        /// <summary> The ModelBaseCollection function is a constructor that takes in an IEnumerable of domain objects and creates a wrapper object for each one.
-        /// The wrapper object is then added to the collection.</summary>
-        /// <param name="IEnumerable&lt;TDm&gt; domainCollection"> What is this parameter used for?</param>
-        /// <returns> A modelbasecollection</returns>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelBaseCollection{TVM, TDm}"/> class by wrapping each supplied
+        /// domain object in a <typeparamref name="TVM"/> instance and storing the corresponding domain items.
+        /// </summary>
+        /// <param name="domainCollection">Sequence of domain models that must be wrapped by <typeparamref name="TVM"/>.</param>
+        /// <exception cref="MissingMethodException">
+        /// Thrown when <typeparamref name="TVM"/> does not provide a public constructor that accepts a
+        /// <typeparamref name="TDm"/> argument.
+        /// </exception>
         protected ModelBaseCollection(IEnumerable<TDm> domainCollection)
         {
             // Set the domain collection
@@ -50,6 +67,10 @@ namespace VisionNet.Core.Patterns
         #endregion
 
         #region Propiedades
+        /// <summary>
+        /// Gets the current list of domain objects associated with the observable collection, exposing the same instances
+        /// stored in <see cref="_mDomainCollection"/> so consumers can operate on the underlying data when required.
+        /// </summary>
         public IList<TDm> DomainCollection { get { return _mDomainCollection; } }
         #endregion
     }
