@@ -7,13 +7,58 @@ using VisionNet.Drawing;
 
 namespace VisionNet.Core.AI
 {
+    /// <summary>
+    /// Provides a simplified HDBSCAN-based clustering routine that partitions the configured point collection
+    /// into dense groups based on mutual reachability distances derived from the minimum cluster size.
+    /// </summary>
+    /// <typeparam name="T">Type of contextual information carried with each clustered point.</typeparam>
     public class HdbscanClustering<T>
     {
+        /// <summary>
+        /// Gets or sets the collection of data points, each paired with contextual metadata, that will be
+        /// evaluated for clustering when <see cref="Execute"/> is invoked.
+        /// </summary>
+        /// <remarks>
+        /// The list must be non-null and should contain at least <see cref="MinClusterSize"/> elements to form
+        /// a cluster; otherwise, only smaller clusters or an empty result will be produced.
+        /// </remarks>
+        /// <exception cref="NullReferenceException">Thrown by <see cref="Execute"/> if this property is set to <c>null</c>.</exception>
         public List<PointFWithContext<T>> Points { get; set; } = new List<PointFWithContext<T>>();
+
+        /// <summary>
+        /// Gets or sets the minimum number of points that a dense region must contain to be considered a cluster
+        /// during execution.
+        /// </summary>
+        /// <remarks>
+        /// Values less than one cause <see cref="Execute"/> to fail when evaluating core distances because the
+        /// algorithm expects a positive cluster size.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">Potentially thrown by consumers prior to calling <see cref="Execute"/> to validate input; no internal validation is performed.</exception>
         public int MinClusterSize { get; set; } = 5;
 
+        /// <summary>
+        /// Gets the clusters identified by the last call to <see cref="Execute"/>, where each inner list contains
+        /// the points that belong to the same cluster.
+        /// </summary>
+        /// <remarks>
+        /// The property is populated after <see cref="Execute"/> completes. It is <c>null</c> until the first
+        /// execution, or empty when no clusters meet the minimum size requirement.
+        /// </remarks>
         public List<List<PointFWithContext<T>>> Clusters { get; private set; }
 
+        /// <summary>
+        /// Executes the clustering algorithm by computing core distances, constructing a mutual reachability graph,
+        /// building a minimum spanning tree, and extracting dense components whose size exceeds the configured
+        /// threshold.
+        /// </summary>
+        /// <remarks>
+        /// The method updates <see cref="Clusters"/> with the resulting partition. Points that do not belong to a
+        /// sufficiently dense region are excluded from the final clusters.
+        /// </remarks>
+        /// <exception cref="NullReferenceException">Thrown when <see cref="Points"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <see cref="MinClusterSize"/> is less than one, resulting in an invalid core distance index.
+        /// </exception>
         public void Execute()
         {
             int n = Points.Count;
