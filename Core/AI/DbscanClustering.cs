@@ -8,13 +8,40 @@ using VisionNet.Drawing;
 
 namespace VisionNet.Core.AI
 {
+    /// <summary>
+    /// Provides a data set agnostic implementation of the DBSCAN clustering algorithm for <see cref="PointFWithContext{T}"/> instances.
+    /// </summary>
+    /// <typeparam name="T">The type of contextual metadata associated with each clustered point.</typeparam>
     public class DbscanClustering<T>
     {
+        /// <summary>
+        /// Gets or sets the collection of data points to be clustered, each paired with its contextual metadata.
+        /// </summary>
+        /// <value>A non-null list containing the input <see cref="PointFWithContext{T}"/> instances to analyze.</value>
         public List<PointFWithContext<T>> Points { get; set; } = new List<PointFWithContext<T>>();
+
+        /// <summary>
+        /// Gets or sets the maximum Euclidean distance between two points for one to be considered within the same neighborhood.
+        /// </summary>
+        /// <value>A non-negative radius, in the same units as the point coordinates, that defines the density reachability threshold. Defaults to 5.</value>
         public float Epsilon { get; set; } = 5.0f;
+
+        /// <summary>
+        /// Gets or sets the minimum number of neighboring points required for a point to be considered a core point.
+        /// </summary>
+        /// <value>An integer greater than or equal to 1 that determines the cluster density requirement. Defaults to 5.</value>
         public int MinPoints { get; set; } = 5;
+
+        /// <summary>
+        /// Gets the clusters discovered by the most recent execution of the algorithm.
+        /// </summary>
+        /// <value>A list of clusters, where each cluster contains the <see cref="PointFWithContext{T}"/> instances assigned to it. The list is empty until <see cref="Execute()"/> is called.</value>
         public List<List<PointFWithContext<T>>> Clusters { get; private set; } = new List<List<PointFWithContext<T>>>();
 
+        /// <summary>
+        /// Executes the DBSCAN clustering algorithm on the configured <see cref="Points"/> using the current <see cref="Epsilon"/> and <see cref="MinPoints"/> settings.
+        /// </summary>
+        /// <exception cref="NullReferenceException">Thrown when <see cref="Points"/> is <see langword="null"/>.</exception>
         public void Execute()
         {
             int clusterId = 0;
