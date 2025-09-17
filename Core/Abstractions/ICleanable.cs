@@ -12,15 +12,12 @@
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Cleanable interface
-    /// </summary>
-    /// <summary>
-    /// Defines an interface for objects that can perform a cleanup operation.
+    /// Exposes the ability for an object to proactively release resources and reset transient state so it can be safely reused or disposed without leaving residual data.
     /// </summary>
     public interface ICleanable
     {
         /// <summary>
-        /// Performs the cleanup operation on the object, releasing resources or resetting states as necessary.
+        /// Executes the cleanup sequence required to return the implementer to a pristine state, releasing unmanaged handles and clearing caches as appropriate for the concrete implementation.
         /// </summary>
         void CleanUp();
     }

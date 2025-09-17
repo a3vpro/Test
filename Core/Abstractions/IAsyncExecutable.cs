@@ -15,13 +15,16 @@ using System.Threading.Tasks;
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Specifies a executable instance
+    /// Augments an executable component with asynchronous execution capabilities that support cooperative cancellation.
     /// </summary>
     public interface IAsyncExecutable: IExecutable
     {
         /// <summary>
-        /// Perform the execute command in asynchronous mode
+        /// Performs the execution logic asynchronously, allowing the caller to await completion while optionally observing a cancellation token.
         /// </summary>
+        /// <param name="cancellationToken">Token used to observe cancellation requests; callers should provide a non-default value when they need to abort execution early.</param>
+        /// <returns>A task that completes when the execution logic finishes or faults, and faults if the underlying operation fails.</returns>
+        /// <exception cref="OperationCanceledException">Thrown when <paramref name="cancellationToken"/> is signaled before or during execution.</exception>
         Task ExecuteAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

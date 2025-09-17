@@ -12,14 +12,14 @@
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Clonable interface
+    /// Defines the contract required to expose a deep clone operation capable of returning an independent copy of the current instance, ensuring that mutations on the clone do not impact the source object.
     /// </summary>
     public interface ICloneable<T>
     {
         /// <summary>
-        /// Creates a new instance of the object <typeparamref name="T"/> that is a deep copy of the current instance.
+        /// Creates a new instance of the object <typeparamref name="T"/> that is a deep copy of the current instance, including any nested structures, so callers can safely mutate the resulting value without affecting the original.
         /// </summary>
-        /// <returns>A new object <typeparamref name="T"/> that is a copy of this instance.</returns>
+        /// <returns>A fully detached copy of the current instance that mirrors the complete state of the source object.</returns>
         T Clone();
     }
 }

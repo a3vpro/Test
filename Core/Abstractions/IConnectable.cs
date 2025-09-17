@@ -14,32 +14,31 @@ using System;
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Represents a connectable instance that can connect and disconnect from a server.
+    /// Describes the contract for components that establish and terminate external connections while tracking state transitions and respecting configured timeouts.
     /// </summary>
     public interface IConnectable
     {
         /// <summary>
-        /// Gets the timeout duration for connecting to a server, expressed in milliseconds.
+        /// Gets the maximum amount of time the implementation allows for the connection handshake before aborting the attempt.
         /// </summary>
         TimeSpan ConnectionTimeout { get; }
 
         /// <summary>
-        /// Gets the current status of the connection.
+        /// Gets the current lifecycle status of the connection, allowing callers to inspect whether the endpoint is reachable, transitioning, or faulted.
         /// </summary>
-        /// <value>
-        /// The current connection status, represented by an instance of <see cref="ConnectionStatus"/>.
-        /// </value>
         ConnectionStatus ConnectionStatus { get; }
 
         /// <summary>
-        /// Initiates a connection to the server.
+        /// Initiates the connection workflow to the underlying endpoint, performing any necessary negotiation or authentication defined by the implementation.
         /// </summary>
+        /// <exception cref="TimeoutException">Thrown when the connection attempt exceeds <see cref="ConnectionTimeout"/> without completing.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when a connection attempt is issued while the implementation is already connected or otherwise in a state that disallows reconnection.</exception>
         void Connect();
 
         /// <summary>
-        /// Disconnects from the server.
-        /// If already disconnected, this method does nothing.
+        /// Gracefully terminates the active connection and releases any associated resources while updating the connection status accordingly.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when a disconnect is attempted while the connection is already closed and the implementation forbids redundant calls.</exception>
         void Disconnect();
     }
 }

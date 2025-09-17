@@ -14,13 +14,15 @@ using VisionNet.Core.States;
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Represents a transition for a connection status, ensuring it adheres to validation rules defined by the base class.
+    /// Configures the allowed connection state transitions for <see cref="ConnectionStatus"/> state machines, leveraging <see cref="StatusValidator{TStatus}"/> infrastructure to enforce valid progressions.
     /// </summary>
     public class ConnectionStatusTransition : StatusValidator<ConnectionStatus>
     {
-        // Add the rest of the class members with documentation if necessary.
-        /// <summary> The ConnectionStatusTransition function is a constructor that creates the possible transitions between states for the ConnectionStatus state machine.</summary>
-        /// <returns> The connectionstatustransition function.</returns>
+        // Define the happy-path and recovery transitions so consumers cannot move to unsupported states accidentally.
+        /// <summary>
+        /// Initializes the validator with the set of allowed transitions between connection states so that only legal moves are accepted by the state machine.
+        /// </summary>
+        /// <exception cref="System.ArgumentException">Propagated when the underlying <see cref="StatusValidator{TStatus}.AddTransition(TStatus, TStatus)"/> method rejects duplicate or contradictory transition definitions.</exception>
         public ConnectionStatusTransition()
     {
         AddTransition(ConnectionStatus.Initial, ConnectionStatus.ReadyToConnect);
