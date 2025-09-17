@@ -191,28 +191,29 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// The is generic i list of a type
+        /// Determines whether the supplied object represents a generic <see cref="IList"/> whose element type is assignable to the expected type.
         /// </summary>
-        /// <param name="obj">The obj.</param>
-        /// <param name="expectedElementType">The expected element type.</param>
-        /// <returns>The result.</returns>
+        /// <param name="obj">The instance to inspect for <see cref="IList"/> compatibility; may be <c>null</c> when the check should fail.</param>
+        /// <param name="expectedElementType">The element type that valid list implementations must expose through their generic argument.</param>
+        /// <returns><c>true</c> when <paramref name="obj"/> implements <see cref="IList{T}"/> for an element type that can be assigned to <paramref name="expectedElementType"/>; otherwise, <c>false</c>.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="expectedElementType"/> is <c>null</c>, because the runtime cannot evaluate assignability.</exception>
         public static bool IsListOf(this object obj, Type expectedElementType)
         {
-            // Verifica si el objeto es un IList. Esto también será verdadero para IList<T>.
+            // If the instance is any IList (non-generic or generic), proceed to inspect generic type arguments.
             if (obj is IList)
             {
                 var objType = obj.GetType();
 
-                // Verifica si el objeto es un tipo genérico.
+                // Only generic types can expose ILists with element type metadata for assignability checks.
                 if (objType.IsGenericType)
                 {
-                    // Obtiene la interfaz IList<T> del objeto, si existe.
+                    // Locate the IList<T> interface among the implemented interfaces so its type arguments can be inspected.
                     var iListInterface = objType.GetInterfaces()
                         .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IList<>));
 
                     if (iListInterface != null && iListInterface.Count() == 1)
                     {
-                        // Comprueba si el tipo esperado es asignable desde el tipo de los elementos en IList<T>.
+                        // Compare the discovered element type with the requested expected type to confirm compatibility.
                         var elementType = iListInterface.FirstOrDefault()?.GetGenericArguments()[0];
                         return expectedElementType.IsAssignableFrom(elementType);
                     }
@@ -222,6 +223,14 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains an element that is equal to the specified value using the default equality comparer.
+        /// </summary>
+        /// <typeparam name="T">The element type stored in the sequence.</typeparam>
+        /// <param name="sequence">The sequence to search; must not be <c>null</c>.</param>
+        /// <param name="value">The value to locate using <see cref="EqualityComparer{T}.Default"/>.</param>
+        /// <returns><c>true</c> when at least one element matches <paramref name="value"/>; otherwise, <c>false</c>.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="sequence"/> is <c>null</c>, because enumeration cannot be performed.</exception>
         public static bool Contains<T>(this IEnumerable<T> sequence, T value)
         {
             IEqualityComparer<T> @default = EqualityComparer<T>.Default;
@@ -236,6 +245,14 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the non-generic sequence contains an element equal to the specified value using the default object comparer.
+        /// </summary>
+        /// <param name="sequence">The sequence to search; must not be <c>null</c>.</param>
+        /// <param name="value">The value to locate using <see cref="Comparer{T}.Default"/> for <see cref="object"/> instances.</param>
+        /// <returns><c>true</c> when an element compares equal to <paramref name="value"/>; otherwise, <c>false</c>.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="sequence"/> is <c>null</c>, because enumeration cannot be performed.</exception>
+        /// <exception cref="ArgumentException">Thrown when elements of <paramref name="sequence"/> do not support comparison with <paramref name="value"/> via <see cref="IComparable"/>.</exception>
         public static bool Contains(this IEnumerable sequence, object value)
         {
             Comparer<object> @default = Comparer<object>.Default;
@@ -250,6 +267,14 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the sequence contains any element that is equal to at least one value from the provided candidate set.
+        /// </summary>
+        /// <typeparam name="T">The element type stored in the sequence and candidate set.</typeparam>
+        /// <param name="sequence">The sequence to search for matches; must not be <c>null</c>.</param>
+        /// <param name="values">The candidate values to look for; may be <c>null</c> or empty to short-circuit the check.</param>
+        /// <returns><c>true</c> when <paramref name="sequence"/> contains any element present in <paramref name="values"/>; otherwise, <c>false</c>.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="sequence"/> is <c>null</c>, because enumeration cannot be performed.</exception>
         public static bool ContainsAny<T>(this IEnumerable<T> sequence, IEnumerable<T> values)
         {
             if (IsSequenceNullOrEmpty(values))
@@ -282,6 +307,13 @@ namespace VisionNet.Core.Collections
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the non-generic sequence contains any element that equals one of the supplied candidate values using object equality semantics.
+        /// </summary>
+        /// <param name="sequence">The sequence to inspect; must not be <c>null</c>.</param>
+        /// <param name="values">The candidate values to look for; may be <c>null</c> or empty to short-circuit the check.</param>
+        /// <returns><c>true</c> when <paramref name="sequence"/> contains any of the elements in <paramref name="values"/>; otherwise, <c>false</c>.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="sequence"/> is <c>null</c>, because enumeration cannot be performed.</exception>
         public static bool ContainsAny(this IEnumerable sequence, IEnumerable values)
         {
             if (IsSequenceNullOrEmpty(values))

@@ -13,12 +13,17 @@ using System;
 
 namespace VisionNet.Core.Encoding
 {
+    /// <summary>
+    /// Provides helpers for converting plain text to and from Base64-encoded ASCII representations.
+    /// </summary>
     public class Base64EncoderDecoder
     {
-        // Encripta una cadena
-        /// <summary> The Encode function takes a string and returns the base64 encoded version of that string.</summary>
-        /// <param name="source"> </param>
-        /// <returns> A string.</returns>
+        /// <summary>
+        /// Encodes the supplied text as a Base64 string using ASCII byte representation.
+        /// </summary>
+        /// <param name="source">The plain-text value to encode; must not be <c>null</c>.</param>
+        /// <returns>The Base64-encoded ASCII string representation of <paramref name="source"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <c>null</c>, because ASCII encoding requires a valid input string.</exception>
         public string Encode(string source)
         {
             string result = string.Empty;
@@ -27,10 +32,13 @@ namespace VisionNet.Core.Encoding
             return result;
         }
 
-        /// Esta función desencripta la cadena que le envíamos en el parámentro de entrada.
-        /// <summary> The Decode function takes a string and converts it to ASCII.</summary>
-        /// <param name="source"> The string to be decoded</param>
-        /// <returns> A string</returns>
+        /// <summary>
+        /// Decodes the supplied Base64 string into its ASCII plain-text representation.
+        /// </summary>
+        /// <param name="source">The Base64-encoded string to decode; must contain valid Base64 data.</param>
+        /// <returns>The ASCII string produced by decoding <paramref name="source"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <c>null</c>, because Base64 conversion requires an input value.</exception>
+        /// <exception cref="FormatException">Thrown when <paramref name="source"/> is not a valid Base64 string.</exception>
         public string Decode(string source)
         {
             string result = string.Empty;

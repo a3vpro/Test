@@ -4,15 +4,17 @@ using VisionNet.Core.Patterns;
 
 namespace VisionNet.Core
 {
+    /// <summary>
+    /// Represents a service capable of updating runtime configuration across multiple managed components.
+    /// </summary>
     public interface IRuntimeConfigurableService
     {
         /// <summary>
-        /// Refresca los parámetros de runtime de los objetos gestionados en masa.
-        /// Para cada entrada en el diccionario, se usa la key para obtener el objeto mediante Get 
-        /// y se invoca RefreshRuntimeParameters con el options correspondiente.
+        /// Refreshes runtime parameters for each managed component using the supplied option instances.
+        /// For every dictionary entry, the key identifies the target component and the value provides the new runtime options applied through the component's refresh pipeline.
         /// </summary>
         /// <param name="updatedOptionsDictionary">
-        /// Diccionario que asocia un identificador (por ejemplo, Index o Name) con su instancia de IRuntimeOptions personalizada.
+        /// Dictionary mapping unique component identifiers (for example, index or name) to their tailored <see cref="IRuntimeOptions"/> instances.
         /// </param>
         void RefreshAllRuntimeParameters(Dictionary<string, IRuntimeOptions> updatedOptionsDictionary);
     }
