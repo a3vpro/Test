@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="WRITE INHERITANCE COLUMN">
+    <Position X="21.861" Y="1.771" Height="0.594" Width="2.325" />
+  </Comment>
+  <Comment CommentText="READ INHERITANCE COLUMN">
+    <Position X="15.048" Y="1.646" Height="0.594" Width="2.325" />
+  </Comment>
+  <Comment CommentText="DIRECT INHERITANCE COLUMN">
+    <Position X="8.007" Y="1.518" Height="0.594" Width="2.325" />
+  </Comment>
+  <Interface Name="VisionNet.Core.SafeObjects.ISafeObjectCollection&lt;TKey, TValue, TType&gt;">
+    <Position X="9.75" Y="15.5" Width="3.25" />
+    <InheritanceLine Type="VisionNet.Core.SafeObjects.IReadonlySafeObjectCollection&lt;TKey, TValue, TType&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="15.5" Y="13.75" />
+        <Point X="15.125" Y="13.75" />
+        <Point X="15.125" Y="15.851" />
+        <Point X="13" Y="15.851" />
+      </Path>
+    </InheritanceLine>
+    <InheritanceLine Type="VisionNet.Core.SafeObjects.IWriteSafeObjectCollection&lt;TKey, TValue, TType&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="25" Y="13.937" />
+        <Point X="24.625" Y="13.937" />
+        <Point X="24.625" Y="15.851" />
+        <Point X="13" Y="15.851" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SafeObjects\ISafeObjectCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.SafeObjects.IReadonlySafeObjectCollection&lt;TKey, TValue, TType&gt;">
+    <Position X="15.5" Y="12.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAgEAAQAAAAAAAAAAgBAAAgAAAQAAAA=</HashCode>
+      <FileName>SafeObjects\IReadonlySafeObjectCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.SafeObjects.IWriteSafeObjectCollection&lt;TKey, TValue, TType&gt;">
+    <Position X="25" Y="13" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAADAAAA=</HashCode>
+      <FileName>SafeObjects\IWriteSafeObjectCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.IReadOnlyRepository&lt;TEntity, TPrimaryKey&gt;">
+    <Position X="14.5" Y="3" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAQAAAAAAAAAAgAAAAEAAAA=</HashCode>
+      <FileName>Patterns\Repository\IReadOnlyRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.ISimpleRepository&lt;TEntity, TPrimaryKey&gt;">
+    <Position X="9.5" Y="5.5" Width="3" />
+    <InheritanceLine Type="VisionNet.Core.Patterns.IReadOnlyRepository&lt;TEntity, TPrimaryKey&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.5" Y="3.625" />
+        <Point X="14.125" Y="3.625" />
+        <Point X="14.125" Y="5.75" />
+        <Point X="12.5" Y="5.75" />
+      </Path>
+    </InheritanceLine>
+    <InheritanceLine Type="VisionNet.Core.Patterns.IWriteRepository&lt;TEntity, TPrimaryKey&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="22" Y="3.625" />
+        <Point X="21.625" Y="3.625" />
+        <Point X="21.625" Y="5.75" />
+        <Point X="17.458" Y="5.75" Type="JumpStart" />
+        <Point X="17.292" Y="5.75" Type="JumpEnd" />
+        <Point X="15.833" Y="5.75" Type="JumpStart" />
+        <Point X="15.667" Y="5.75" Type="JumpEnd" />
+        <Point X="12.5" Y="5.75" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Repository\ISimpleRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Types.IWriteNamedValueCollection">
+    <Position X="22.5" Y="8.5" Width="2.5" />
+    <InheritanceLine Type="VisionNet.Core.Patterns.IWriteRepository&lt;TEntity, TPrimaryKey&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="23.75" Y="4.488" />
+        <Point X="23.75" Y="8.5" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Types\NamedValue\IWriteNamedValueCollection.cs</FileName>
+      <NewMemberFileName>Types\NamedValue\IReadOnlyNamedValueCollection.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Types.INamedValueCollection">
+    <Position X="10" Y="10.25" Width="2.5" />
+    <InheritanceLine Type="VisionNet.Core.Types.IWriteNamedValueCollection" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="22.5" Y="8.938" />
+        <Point X="22.125" Y="8.938" />
+        <Point X="22.125" Y="10.688" />
+        <Point X="17.458" Y="10.688" Type="JumpStart" />
+        <Point X="17.292" Y="10.688" Type="JumpEnd" />
+        <Point X="12.5" Y="10.688" />
+      </Path>
+    </InheritanceLine>
+    <InheritanceLine Type="VisionNet.Core.Types.IReadOnlyNamedValueCollection" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.5" Y="8.938" />
+        <Point X="14.125" Y="8.938" />
+        <Point X="14.125" Y="10.688" />
+        <Point X="12.5" Y="10.688" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Types\NamedValue\INamedValueCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.ISimpleRepository&lt;TEntity&gt;">
+    <Position X="6.25" Y="8.5" Width="2.25" />
+    <InheritanceLine Type="VisionNet.Core.Patterns.ISimpleRepository&lt;TEntity, TPrimaryKey&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="11" Y="6.627" />
+        <Point X="11" Y="8.125" />
+        <Point X="7.25" Y="8.125" />
+        <Point X="7.25" Y="8.5" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Repository\IGenericKeySimpleRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.IRepository&lt;TEntity, TPrimaryKey&gt;">
+    <Position X="2.25" Y="8.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAQgAAICACAAAAAAAAACASAAIEAEAgAABAAIARAEIE=</HashCode>
+      <FileName>Patterns\Repository\IRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.IWriteRepository&lt;TEntity, TPrimaryKey&gt;">
+    <Position X="22" Y="3" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAQAAEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Repository\IWriteRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Types.IReadOnlyNamedValueCollection">
+    <Position X="14.5" Y="8.5" Width="2.5" />
+    <InheritanceLine Type="VisionNet.Core.Patterns.IReadOnlyRepository&lt;TEntity, TPrimaryKey&gt;" FixedFromPoint="true">
+      <Path>
+        <Point X="15.75" Y="4.68" />
+        <Point X="15.75" Y="8.5" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Types\NamedValue\IReadOnlyNamedValueCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

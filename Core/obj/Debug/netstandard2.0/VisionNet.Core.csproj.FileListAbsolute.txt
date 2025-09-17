@@ -1,0 +1,13 @@
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\build\netstandard2.0\VisionNet.Core.deps.json
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\build\netstandard2.0\VisionNet.Core.dll
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\build\netstandard2.0\VisionNet.Core.pdb
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\build\netstandard2.0\VisionNet.Core.xml
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.csproj.AssemblyReference.cache
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.AssemblyInfoInputs.cache
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.AssemblyInfo.cs
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.csproj.CoreCompileInputs.cache
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.csproj.CopyComplete
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.dll
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.xml
+D:\01 DEVELOP\SaintGobain_InspecionVidrios_Net_V4_8\core\src\src\core\core\obj\Debug\netstandard2.0\VisionNet.Core.pdb
