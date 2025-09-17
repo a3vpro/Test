@@ -14,6 +14,9 @@ using System;
 
 namespace VisionNet.Core.Patterns
 {
+    /// <summary>
+    /// Represents an <see cref="IRelayCommand"/> implementation that delegates command logic to callbacks.
+    /// </summary>
     public class RelayCommand : IRelayCommand
     {
         #region Fields
@@ -26,25 +29,21 @@ namespace VisionNet.Core.Patterns
         #region Constructors
 
         
-        /// <summary> The RelayCommand function is a constructor that takes in an Action and Func.
-        /// The Action is the command to be executed, while the Func determines whether or not
-        /// the command can be executed.</summary>
-        /// <param name="Action execute"> The action to be executed.</param>
-        /// <returns> A new relaycommand object</returns>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelayCommand"/> class with the specified execution delegate.
+        /// </summary>
+        /// <param name="execute">The delegate to invoke when <see cref="Execute(object)"/> is called; must not be <see langword="null"/>.</param>
         public RelayCommand(Action execute)
             : this(execute, null)
         {
         }
 
-        
-        /// <summary> The RelayCommand function is a constructor that takes two parameters: an Action and a Func.
-        /// The Action parameter is the method to be executed when the command is invoked. 
-        /// The Func parameter returns true if this command can be executed; otherwise, false.</summary>
-        /// <param name="Action execute"> </param>
-        /// <param name="Func&lt;bool&gt; canExecute"> /// the canexecute parameter is a function that returns true or false. 
-        /// it's used to determine whether the command should be executed or not. 
-        /// if it returns true, the command will be executed, otherwise it won't.</param>
-        /// <returns> A relaycommand object</returns>
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelayCommand"/> class with the specified execution and availability delegates.
+        /// </summary>
+        /// <param name="execute">The delegate to invoke when <see cref="Execute(object)"/> is called; must not be <see langword="null"/>.</param>
+        /// <param name="canExecute">An optional delegate that determines whether the command can execute. If <see langword="null"/>, the command is always enabled.</param>
         public RelayCommand(Action execute, Func<bool> canExecute)
         {
             _execute = execute;
@@ -56,39 +55,39 @@ namespace VisionNet.Core.Patterns
         #region ICommand Members
 
         
-        /// <summary> The CanExecute function is used to determine whether or not the command can be executed.
-        /// If no CanExecute function was provided when the command was created, this will always return true.</summary>
-        /// <param name="object parameter"> ///     the parameter is not used in this example.
-        /// </param>
-        /// <returns> A boolean value. if the function returns true, the button is enabled and clickable. if it returns false, the button is disabled.</returns>
+        /// <summary>
+        /// Determines whether the command can execute by invoking the availability delegate if one was supplied.
+        /// </summary>
+        /// <param name="parameter">Command parameter supplied by the caller. This implementation ignores the value.</param>
+        /// <returns><see langword="true"/> if the command can execute or no availability delegate was provided; otherwise, <see langword="false"/>.</returns>
         public bool CanExecute(object parameter)
         {
             return null == _canExecute ? true : _canExecute();
         }
 
-        
-        /// <summary> The Execute function is called when the command is executed.
-        /// It calls the _execute function, which was passed in as a parameter to 
-        /// the constructor.</summary>
-        /// <param name="object parameter"> /// the parameter is used to pass a value to the command. 
-        /// this can be useful if you want to pass an object or some other data type. 
-        /// </param>
-        /// <returns> A boolean value</returns>
+
+        /// <summary>
+        /// Executes the command by invoking the execution delegate supplied to the constructor.
+        /// </summary>
+        /// <param name="parameter">Command parameter supplied by the caller. This implementation ignores the value.</param>
         public void Execute(object parameter)
         {
             _execute();
         }
 
-        
-        /// <summary> The RaiseCanExecuteChanged function is used to notify the UI that the CanExecute function has changed.
-        /// This allows for a more responsive UI.</summary>
-        /// <returns> Void.</returns>
+
+        /// <summary>
+        /// Raises the <see cref="CanExecuteChanged"/> event to notify listeners that the return value of <see cref="CanExecute(object)"/> might have changed.
+        /// </summary>
         public void RaiseCanExecuteChanged()
         {
             if (null != this.CanExecuteChanged)
                 this.CanExecuteChanged.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Occurs when changes affecting whether the command should execute are detected. Raised by <see cref="RaiseCanExecuteChanged"/>.
+        /// </summary>
         public event EventHandler CanExecuteChanged;
 
         #endregion ICommand Members
