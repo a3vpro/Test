@@ -14,15 +14,21 @@ using System;
 
 namespace VisionNet.Core.Maths
 {
+    /// <summary>
+    /// Supplies extension methods for <see cref="Random"/> that generate values from specialised distributions
+    /// and domains, including Gaussian, exponential, and date-based variations as well as convenience helpers
+    /// for booleans and strings. All routines are stateless and rely solely on the provided generator instance.
+    /// </summary>
     public static class RandomExtension
     {
         /// <summary>
-        /// Returns a normally distributed random number, with the specified mean and standard deviation.
+        /// Generates a normally distributed random number using the Box-Muller transform with the supplied mean and standard deviation.
         /// </summary>
-        /// <param name="random">The random number generator instance.</param>
-        /// <param name="mean">The mean of the distribution.</param>
-        /// <param name="stdDev">The standard deviation of the distribution.</param>
-        /// <returns>A random number with a normal distribution.</returns>
+        /// <param name="random">The random number generator instance providing uniform samples. Must not be null.</param>
+        /// <param name="mean">The central tendency of the desired distribution, expressed in the same units as the result.</param>
+        /// <param name="stdDev">The standard deviation of the distribution. Negative values invert the distribution.</param>
+        /// <returns>A pseudo-random number drawn from a normal distribution parameterised by <paramref name="mean"/> and <paramref name="stdDev"/>.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="random"/> is null.</exception>
         public static double NextGaussian(this Random random, double mean, double stdDev)
         {
             double u1 = 1.0 - random.NextDouble(); // Uniform(0,1] random doubles
@@ -32,13 +38,15 @@ namespace VisionNet.Core.Maths
         }
 
         /// <summary>
-        /// Returns a random number between min and max, with an exponential distribution.
+        /// Returns an exponentially distributed random number constrained between the provided minimum and maximum bounds.
         /// </summary>
-        /// <param name="random">The random number generator instance.</param>
-        /// <param name="min">The minimum value of the random number.</param>
-        /// <param name="max">The maximum value of the distribution.</param>
-        /// <param name="rate">The rate parameter is the inverse of the mean. Default value 1/mean = 1 gives a mean of 1.</param>
-        /// <returns>A random number between min and max, with a distribution skewed towards higher values.</returns>
+        /// <param name="random">The random number generator instance providing uniform samples. Must not be null.</param>
+        /// <param name="min">The inclusive lower bound of the desired sample range.</param>
+        /// <param name="max">The inclusive upper bound of the desired sample range.</param>
+        /// <param name="rate">The exponential rate λ, defined as the inverse of the mean. Values must be non-zero.</param>
+        /// <returns>A pseudo-random number constrained to the interval between <paramref name="min"/> and <paramref name="max"/> with exponential weighting.</returns>
+        /// <exception cref="DivideByZeroException">Thrown when <paramref name="rate"/> equals zero.</exception>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="random"/> is null.</exception>
         public static double NextExp(this Random random, double min, double max, double rate = 1)
         {
             var exp_rate_a = Mth.Exp(-rate * min);
@@ -93,14 +101,15 @@ namespace VisionNet.Core.Maths
         }
 
         /// <summary>
-        /// Creates a random string using the specified character set.
+        /// Creates a random string using the specified character set and either fixed or variable length output.
         /// </summary>
-        /// <param name="random">Random instance to use.</param>
-        /// <param name="charSet">Set of characters used in the random output.</param>
-        /// <param name="maxLength">Maximum length of the output string.</param>
-        /// <param name="fixedLenght">If true, the string will have a fixed length; otherwise, the length will be random.</param>
-        /// <returns>A randomly generated string.</returns>
-        /// <exception cref="ArgumentException">Thrown if any arguments are invalid.</exception>
+        /// <param name="random">Random instance supplying the uniform distribution. Must not be null.</param>
+        /// <param name="charSet">Set of characters eligible for selection. Must not be null or empty.</param>
+        /// <param name="maxLength">Maximum output length in characters. Must be a positive integer.</param>
+        /// <param name="fixedLenght">When <see langword="true"/>, the output length equals <paramref name="maxLength"/>; otherwise a random length in the inclusive range 1 to <paramref name="maxLength"/> is chosen.</param>
+        /// <returns>A randomly generated string drawn from <paramref name="charSet"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="charSet"/> is empty or <paramref name="maxLength"/> is less than or equal to zero.</exception>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="random"/> or <paramref name="charSet"/> is null.</exception>
         public static string NextString(this Random random, string charSet, int maxLength, bool fixedLenght = false)
         {
             if (charSet.Length == 0)
@@ -117,12 +126,13 @@ namespace VisionNet.Core.Maths
         }
 
         /// <summary>
-        /// Generates a random boolean value based on the specified probability of returning true.
+        /// Generates a random boolean where the probability of <see langword="true"/> is explicitly controlled.
         /// </summary>
-        /// <param name="random">The Random instance that extends this method.</param>
-        /// <param name="probability">The probability of returning true, expressed as a number between 0.0 and 1.0, where 1.0 means always true.</param>
-        /// <returns>A random boolean value where the probability of true is the given value.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if probability is not in the range of 0.0 to 1.0.</exception>
+        /// <param name="random">The <see cref="Random"/> instance providing uniform samples. Must not be null.</param>
+        /// <param name="probability">The likelihood of a <see langword="true"/> result, expressed as a value between 0.0 and 1.0 inclusive.</param>
+        /// <returns><see langword="true"/> with probability <paramref name="probability"/>; otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="probability"/> falls outside the inclusive range 0.0 to 1.0.</exception>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="random"/> is null.</exception>
         public static bool NextBool(this Random random, double probability)
         {
             if (probability < 0.0 || probability > 1.0)
@@ -133,15 +143,16 @@ namespace VisionNet.Core.Maths
         }
 
         /// <summary>
-        /// Generates a random date within a specified range, adjusted by a mean date and a standard deviation.
+        /// Generates a normally distributed random <see cref="DateTime"/> within a constrained interval centred on a specified mean.
         /// </summary>
-        /// <param name="random">The Random instance that extends this method.</param>
-        /// <param name="minDate">The minimum date that can be generated.</param>
-        /// <param name="maxDate">The maximum date that can be generated.</param>
-        /// <param name="meanDate">The mean date, which is the center of the normal distribution.</param>
-        /// <param name="stdDev">The standard deviation in days, which defines how spread out the dates will be around the mean.</param>
-        /// <returns>A random date within the specified range.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if minDate is greater than maxDate, or if the mean date is outside the bounds of the range.</exception>
+        /// <param name="random">The <see cref="Random"/> instance supplying uniform samples. Must not be null.</param>
+        /// <param name="minDate">The inclusive lower bound of the date range.</param>
+        /// <param name="maxDate">The inclusive upper bound of the date range.</param>
+        /// <param name="meanDate">The expected value of the returned dates. Must lie within the closed interval defined by <paramref name="minDate"/> and <paramref name="maxDate"/>.</param>
+        /// <param name="stdDev">The standard deviation, expressed in days, that controls dispersion around <paramref name="meanDate"/>.</param>
+        /// <returns>A random date constrained to the specified interval with distribution concentrated near <paramref name="meanDate"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="minDate"/> exceeds <paramref name="maxDate"/>, when <paramref name="meanDate"/> is before <paramref name="minDate"/>, or when <paramref name="meanDate"/> is after <paramref name="maxDate"/>.</exception>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="random"/> is null.</exception>
         public static DateTime NextDateTime(this Random random, DateTime minDate, DateTime maxDate, DateTime meanDate, double stdDev)
         {
             if (minDate > maxDate)
