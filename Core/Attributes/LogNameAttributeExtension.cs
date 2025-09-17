@@ -2,13 +2,19 @@
 
 namespace VisionNet.Logging
 {
+    /// <summary>
+    /// Provides extension helpers for retrieving <see cref="LogNameAttribute"/> metadata from
+    /// consumer types.
+    /// </summary>
     public static class LogNameAttributeExtension
     {
-        
-        /// <summary> The GetLogName function returns the name of a log file based on the LogNameAttribute.
-        /// If no attribute is found, it returns null.</summary>
-        /// <param name="this object obj"> The object to get the log name for.</param>
-        /// <returns> The value of the logname property in the lognameattribute class</returns>
+
+        /// <summary>
+        /// Retrieves the configured log name from the <see cref="LogNameAttribute"/> applied to the
+        /// object's runtime type.
+        /// </summary>
+        /// <param name="obj">The instance whose type is expected to be decorated with a <see cref="LogNameAttribute"/>.</param>
+        /// <returns>The value supplied to <see cref="LogNameAttribute.LogName"/>, or <see langword="null"/> when the attribute is absent.</returns>
         public static string GetLogName(this object obj)
         {
 
