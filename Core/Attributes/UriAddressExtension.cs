@@ -30,6 +30,10 @@ namespace VisionNet.Core.Attributes
         /// </returns>
         public static Uri GetUriAddress<T>(this T obj)
         {
+            // GUARD: Prevent null dereference when accessing the object's type.
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
             var attribute = obj.GetType()
                                 .GetCustomAttributes(true)
                                 .OfType<UriAddressAttribute>()
@@ -53,6 +57,10 @@ namespace VisionNet.Core.Attributes
         /// </returns>
         public static string GetUriStringAddress<T>(this T obj)
         {
+            // GUARD: Prevent null dereference when accessing the object's type.
+            if (obj == null)
+                throw new ArgumentNullException(nameof(obj));
+
             var attribute = obj.GetType()
                                 .GetCustomAttributes(true)
                                 .OfType<UriAddressAttribute>()
@@ -75,6 +83,10 @@ namespace VisionNet.Core.Attributes
         /// </returns>
         public static Uri GetUriAddress(this Type type)
         {
+            // GUARD: Ensure the target type is provided before reflection access.
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             var attribute = type.GetCustomAttributes(true)
                                 .OfType<UriAddressAttribute>()
                                 .FirstOrDefault();
@@ -96,6 +108,10 @@ namespace VisionNet.Core.Attributes
         /// </returns>
         public static string GetUriStringAddress(this Type type)
         {
+            // GUARD: Ensure the target type is provided before reflection access.
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             var attribute = type.GetCustomAttributes(true)
                                .OfType<UriAddressAttribute>()
                                .FirstOrDefault();
@@ -119,11 +135,21 @@ namespace VisionNet.Core.Attributes
         /// </returns>
         public static Type GetTypeOfUri(Uri uri, Assembly assembly = null, Type baseType = null)
         {
+            // GUARD: Validate mandatory inputs before proceeding.
+            if (uri == null)
+                throw new ArgumentNullException(nameof(uri));
+
             if (assembly == null)
                 assembly = Assembly.GetExecutingAssembly();
 
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+
             if (baseType == null)
                 baseType = typeof(object);
+
+            if (baseType == null)
+                throw new ArgumentNullException(nameof(baseType));
 
             return assembly
                 .GetTypes()
@@ -143,11 +169,21 @@ namespace VisionNet.Core.Attributes
         /// </returns>
         public static Type GetTypeOfUri(string uriString, Assembly assembly = null, Type baseType = null)
         {
+            // GUARD: Validate mandatory inputs before proceeding.
+            if (uriString == null)
+                throw new ArgumentNullException(nameof(uriString));
+
             if (assembly == null)
                 assembly = Assembly.GetExecutingAssembly();
 
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+
             if (baseType == null)
                 baseType = typeof(object);
+
+            if (baseType == null)
+                throw new ArgumentNullException(nameof(baseType));
 
             return assembly
                 .GetTypes()
