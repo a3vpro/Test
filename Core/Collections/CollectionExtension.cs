@@ -126,6 +126,15 @@ namespace VisionNet.Core.Collections
         /// <returns>A sequence of sub-sequences where each sub-sequence contains elements that satisfy the given condition.</returns>
         public static IEnumerable<IEnumerable<T>> GroupWhile<T>(this IEnumerable<T> seq, Func<T, T, bool> condition)
         {
+            if (seq == null)
+                throw new ArgumentNullException(nameof(seq));
+
+            if (condition == null)
+                throw new ArgumentNullException(nameof(condition));
+
+            if (seq.Any() == false)
+                yield break;
+
             T prev = seq.First();
             List<T> list = new List<T>() { prev };
 
