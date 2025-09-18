@@ -45,6 +45,17 @@ namespace VisionNet.Core.Security
         /// <returns> A string</returns>
         public string Encript(SecureString source, EncriptMethod encriptMethod = EncriptMethod.Base64)
         {
+            // GUARD: Ensure the source SecureString contains data before encryption.
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (source.Length == 0)
+            {
+                throw new ArgumentException("Source cannot be empty.", nameof(source));
+            }
+
             switch (encriptMethod)
             {
                 case EncriptMethod.Base64:
@@ -89,6 +100,17 @@ namespace VisionNet.Core.Security
         /// <returns> A securestring</returns>
         public SecureString Decript(string source, EncriptMethod encriptMethod = EncriptMethod.Base64)
         {
+            // GUARD: Ensure the source string contains data before decryption.
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (source.Length == 0)
+            {
+                throw new ArgumentException("Source cannot be empty.", nameof(source));
+            }
+
             switch (encriptMethod)
             {
                 case EncriptMethod.Base64:
