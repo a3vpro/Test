@@ -22,23 +22,27 @@ namespace VisionNet.Core.Collections
         private int _count;
 
         /// <summary>
-        /// Gets or sets the zero-based index of the selected element, or -1 when no selection is active.
+        /// Gets or sets the index of the currently selected element within the history, or -1 when no element is selected.
         /// </summary>
+        /// <value>A zero-based index for the selected item, or -1 to indicate no selection.</value>
         public int SelectedIndex { get; set; } = -1;
 
         /// <summary>
         /// Gets or sets the selected element associated with <see cref="SelectedIndex"/>; equals <c>default</c> when nothing is selected.
         /// </summary>
+        /// <value>The selected item when <see cref="SelectedIndex"/> is valid; otherwise <c>default(T)</c>.</value>
         public T Selected { get; set; } = default(T);
 
         /// <summary>
         /// Gets the fixed maximum number of elements that can be retained in the collection.
         /// </summary>
+        /// <value>The total capacity available for storing elements.</value>
         public int Capacity { get; }
 
         /// <summary>
-        /// Gets the current number of stored elements in a thread-safe manner.
+        /// Gets the number of elements currently stored in the history in a thread-safe manner.
         /// </summary>
+        /// <value>The count of tracked elements, limited by <see cref="Capacity"/>.</value>
         public int Count
         {
             get
@@ -153,8 +157,8 @@ namespace VisionNet.Core.Collections
         /// <summary>
         /// Gets the element at the specified zero-based index, where index 0 represents the most recent item.
         /// </summary>
-        /// <param name="index">Zero-based index of the element to retrieve.</param>
-        /// <returns>The element at the specified index, or <c>default</c> when the index is out of range.</returns>
+        /// <param name="index">Zero-based offset within the history. Values outside the current range return <c>default(T)</c>.</param>
+        /// <returns>The element stored at the requested position, or <c>default(T)</c> if the index is invalid.</returns>
         public T this[int index]
         {
             get
@@ -172,7 +176,7 @@ namespace VisionNet.Core.Collections
         /// <summary>
         /// Returns an enumerator that iterates over a snapshot of the current elements in order from newest to oldest.
         /// </summary>
-        /// <returns>An enumerator for the captured sequence of elements.</returns>
+        /// <returns>An enumerator yielding items from the most recent to the oldest as captured when enumeration begins.</returns>
         public IEnumerator<T> GetEnumerator()
         {
             T[] snapshot;
@@ -191,6 +195,10 @@ namespace VisionNet.Core.Collections
             }
         }
 
+        /// <summary>
+        /// Returns a non-generic enumerator that iterates through the historical snapshot.
+        /// </summary>
+        /// <returns>An enumerator exposing the same snapshot provided by <see cref="GetEnumerator()"/>.</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
