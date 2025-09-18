@@ -5,10 +5,15 @@ using System.Collections.Generic;
 namespace VisionNet.Core.Collections
 {
     /// <summary>
-    /// Maintains a fixed-size, thread-safe collection that tracks items in reverse chronological order,
-    /// always placing the most recent entry at index 0 while shifting older entries toward the end.
+    /// Represents a thread-safe, fixed-capacity history of elements where the most recently added item is stored at index 0
+    /// and older items are shifted down, discarding the oldest when the capacity is exceeded. Selection metadata tracks a
+    /// logical current item even as insertions reorder stored values.
     /// </summary>
-    /// <typeparam name="T">Type of items captured in the historical record.</typeparam>
+    /// <remarks>
+    /// The collection maintains a bounded timeline of items, always preserving order from newest to oldest. Enumeration returns
+    /// a snapshot to avoid locking during iteration, and selection state is adjusted when insertions displace existing entries.
+    /// </remarks>
+    /// <typeparam name="T">Type of items stored in the historical collection.</typeparam>
     public class HistoricalCollection<T> : IEnumerable<T>
     {
         private readonly object _syncLock = new object();
@@ -17,22 +22,22 @@ namespace VisionNet.Core.Collections
         private int _count;
 
         /// <summary>
-        /// Gets or sets the index of the selected element within the historical sequence; -1 indicates that no element is selected.
+        /// Gets or sets the zero-based index of the selected element, or -1 when no selection is active.
         /// </summary>
         public int SelectedIndex { get; set; } = -1;
 
         /// <summary>
-        /// Gets or sets the currently selected element; equals <see cref="default"/> when <see cref="SelectedIndex"/> equals -1 or the selected entry has been discarded.
+        /// Gets or sets the selected element associated with <see cref="SelectedIndex"/>; equals <c>default</c> when nothing is selected.
         /// </summary>
         public T Selected { get; set; } = default(T);
 
         /// <summary>
-        /// Gets the maximum number of elements that can be retained in the historical buffer.
+        /// Gets the fixed maximum number of elements that can be retained in the collection.
         /// </summary>
         public int Capacity { get; }
 
         /// <summary>
-        /// Gets the current number of items stored in the collection in a thread-safe manner.
+        /// Gets the current number of stored elements in a thread-safe manner.
         /// </summary>
         public int Count
         {
@@ -63,7 +68,11 @@ namespace VisionNet.Core.Collections
         /// <summary>
         /// Inserts an item as the most recent entry, shifting existing elements to older positions and dropping the oldest entry when the capacity is full.
         /// </summary>
-        /// <param name="item">Item captured for historical tracking; may be <see cref="default"/>.</param>
+        /// <param name="item">Item to add to the historical sequence.</param>
+        /// <remarks>
+        /// When a selection is active, the selected index is advanced to maintain its association with the same logical entry;
+        /// the selection is cleared if the tracked element falls outside the retained range.
+        /// </remarks>
         public void Add(T item)
         {
             lock (_syncLock)
@@ -142,11 +151,10 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Gets the element at the specified index, where 0 represents the most recent entry and higher values represent progressively older entries.
-        /// Returns <see cref="default"/> for out-of-range requests.
+        /// Gets the element at the specified zero-based index, where index 0 represents the most recent item.
         /// </summary>
-        /// <param name="index">Zero-based position within the historical sequence.</param>
-        /// <returns>The element at <paramref name="index"/>, or <see cref="default"/> when the index is outside the tracked range.</returns>
+        /// <param name="index">Zero-based index of the element to retrieve.</param>
+        /// <returns>The element at the specified index, or <c>default</c> when the index is out of range.</returns>
         public T this[int index]
         {
             get
@@ -162,9 +170,9 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Creates an enumerator over a snapshot of the current items, preserving the newest-to-oldest ordering at the time of enumeration.
+        /// Returns an enumerator that iterates over a snapshot of the current elements in order from newest to oldest.
         /// </summary>
-        /// <returns>An enumerator that iterates through a stable copy of the tracked history.</returns>
+        /// <returns>An enumerator for the captured sequence of elements.</returns>
         public IEnumerator<T> GetEnumerator()
         {
             T[] snapshot;
