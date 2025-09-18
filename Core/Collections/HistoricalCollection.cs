@@ -4,6 +4,16 @@ using System.Collections.Generic;
 
 namespace VisionNet.Core.Collections
 {
+    /// <summary>
+    /// Represents a thread-safe, fixed-capacity history of elements where the most recently added item is stored at index 0
+    /// and older items are shifted down, discarding the oldest when the capacity is exceeded. Selection metadata tracks a
+    /// logical current item even as insertions reorder stored values.
+    /// </summary>
+    /// <remarks>
+    /// The collection maintains a bounded timeline of items, always preserving order from newest to oldest. Enumeration returns
+    /// a snapshot to avoid locking during iteration, and selection state is adjusted when insertions displace existing entries.
+    /// </remarks>
+    /// <typeparam name="T">Type of items stored in the historical collection.</typeparam>
     public class HistoricalCollection<T> : IEnumerable<T>
     {
         private readonly object _syncLock = new object();
@@ -12,22 +22,22 @@ namespace VisionNet.Core.Collections
         private int _count;
 
         /// <summary>
-        /// Índice del elemento seleccionado. -1 indica que no hay ningún elemento seleccionado.
+        /// Gets or sets the zero-based index of the selected element, or -1 when no selection is active.
         /// </summary>
         public int SelectedIndex { get; set; } = -1;
 
         /// <summary>
-        /// Elemento seleccionado (puede ser default(T) si SelectedIndex = -1).
+        /// Gets or sets the selected element associated with <see cref="SelectedIndex"/>; equals <c>default</c> when nothing is selected.
         /// </summary>
         public T Selected { get; set; } = default(T);
 
         /// <summary>
-        /// Capacidad máxima de la colección (tamaño fijo).
+        /// Gets the fixed maximum number of elements that can be retained in the collection.
         /// </summary>
         public int Capacity { get; }
 
         /// <summary>
-        /// Número actual de elementos en la colección (thread-safe).
+        /// Gets the current number of stored elements in a thread-safe manner.
         /// </summary>
         public int Count
         {
@@ -41,9 +51,10 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Crea la colección con una capacidad máxima fija (> 0).
+        /// Initializes a new instance of the <see cref="HistoricalCollection{T}"/> class with the specified capacity.
         /// </summary>
-        /// <param name="capacity">Capacidad máxima.</param>
+        /// <param name="capacity">Positive number indicating the maximum number of items that can be retained.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="capacity"/> is less than or equal to zero.</exception>
         public HistoricalCollection(int capacity)
         {
             if (capacity <= 0)
@@ -55,10 +66,14 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Agrega un nuevo elemento en la posición 0 (la más "reciente").
-        /// Si la colección está llena, se elimina el elemento más antiguo (al final).
+        /// Adds an item to the collection, inserting it at index 0 and shifting existing elements toward the end,
+        /// discarding the oldest element when the capacity is full.
         /// </summary>
-        /// <param name="item">Elemento a agregar.</param>
+        /// <param name="item">Item to add to the historical sequence.</param>
+        /// <remarks>
+        /// When a selection is active, the selected index is advanced to maintain its association with the same logical entry;
+        /// the selection is cleared if the tracked element falls outside the retained range.
+        /// </remarks>
         public void Add(T item)
         {
             lock (_syncLock)
@@ -105,9 +120,9 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Devuelve el elemento más reciente (índice 0).
-        /// Lanza excepción si no hay elementos.
+        /// Retrieves the most recently added element stored at index 0.
         /// </summary>
+        /// <returns>The most recent element, or <c>default</c> when the collection is empty.</returns>
         public T Newest()
         {
             lock (_syncLock)
@@ -120,7 +135,7 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Limpia la colección y la selección (thread-safe).
+        /// Removes all elements from the collection and clears any active selection.
         /// </summary>
         public void Clear()
         {
@@ -136,8 +151,10 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Indizador para obtener el elemento por índice (0 = más reciente).
+        /// Gets the element at the specified zero-based index, where index 0 represents the most recent item.
         /// </summary>
+        /// <param name="index">Zero-based index of the element to retrieve.</param>
+        /// <returns>The element at the specified index, or <c>default</c> when the index is out of range.</returns>
         public T this[int index]
         {
             get
@@ -153,8 +170,9 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Permite la iteración con foreach, retornando una instantánea de los elementos.
+        /// Returns an enumerator that iterates over a snapshot of the current elements in order from newest to oldest.
         /// </summary>
+        /// <returns>An enumerator for the captured sequence of elements.</returns>
         public IEnumerator<T> GetEnumerator()
         {
             T[] snapshot;
