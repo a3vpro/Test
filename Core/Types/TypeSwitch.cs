@@ -14,47 +14,70 @@ using System.Collections.Generic;
 
 namespace VisionNet.Core.Types
 {
+    /// <summary>
+    /// Provides a fluent type-based dispatcher that maps types to <see cref="Func{TResult}"/> delegates
+    /// and executes the matching delegate to produce a value of type <typeparamref name="O"/>.
+    /// </summary>
+    /// <typeparam name="O">Type returned by each registered delegate and by the switch evaluation.</typeparam>
+    /// <remarks>
+    /// Use <see cref="Case{T}(Func{O})"/> to register handlers for specific types, optionally add a
+    /// <see cref="Default(Func{O})"/> handler, and invoke <see cref="Switch(Type)"/> or
+    /// <see cref="Switch{T}()"/> to execute the associated delegate.
+    /// </remarks>
     public class TypeSwitch<O>
     {
         Dictionary<Type, Func<O>> matches = new Dictionary<Type, Func<O>>();
 
-        /// <summary> The Case function adds a help to use a swith stantment fot type classes.
-        /// The first parameter is the type of object that will be matched against.
-        /// The second parameter is a function that returns an object of type O.</summary>
-        /// <param name="func"> The function to be executed when the type matches. </param>
-        /// <returns> A typeswitch object.</returns>
+        /// <summary>
+        /// Registers a delegate to execute when the specified type <typeparamref name="T"/> is selected.
+        /// </summary>
+        /// <typeparam name="T">Type key that triggers the supplied delegate.</typeparam>
+        /// <param name="func">Delegate invoked to produce the switch result for type <typeparamref name="T"/>.</param>
+        /// <returns>The current <see cref="TypeSwitch{O}"/> instance to continue configuration.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when a delegate has already been registered for type <typeparamref name="T"/>.
+        /// </exception>
         public TypeSwitch<O> Case<T>(Func<O> func)
         {
             matches.Add(typeof(T), () => func());
             return this;
         }
 
-        /// <summary> The Default function is used to set the default case for a TypeSwitch.
-        /// This function should be called last in the chain of Case functions, and it will 
-        /// return an instance of TypeSwitch&lt;O&gt; so that you can continue chaining Case functions.</summary>
-        /// <param name="func"> This is the function that will be executed if no other case matches. </param>
-        /// <returns> The value of the function passed in.</returns>
+        /// <summary>
+        /// Registers a delegate to execute when no other registered type matches the switch request.
+        /// </summary>
+        /// <param name="func">Delegate invoked when no specific type registration is available.</param>
+        /// <returns>The current <see cref="TypeSwitch{O}"/> instance to continue configuration.</returns>
+        /// <exception cref="ArgumentException">Thrown when a default delegate has already been registered.</exception>
         public TypeSwitch<O> Default(Func<O> func)
         {
             matches.Add(typeof(object), () => func());
             return this;
         }
 
-        /// <summary> The Switch function is a dictionary of functions that return an object.
-        /// The key to the dictionary is a Type, and the value is a function that returns an object.
-        /// This allows us to create objects based on their type.</summary>
-        /// <param name="t"> The type of the object to be returned</param>
-        /// <returns> The value of the function that is stored in matches[t]()</returns>
+        /// <summary>
+        /// Executes the delegate associated with the provided type and returns its result.
+        /// </summary>
+        /// <param name="t">Type key whose associated delegate should be executed.</param>
+        /// <returns>The value produced by the delegate registered for the provided type.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="t"/> is <see langword="null"/>.</exception>
+        /// <exception cref="KeyNotFoundException">
+        /// Thrown when no delegate has been registered for the provided <paramref name="t"/> and no default exists.
+        /// </exception>
         public O Switch(Type t)
         {
             return matches[t]();
         }
 
 
-        /// <summary> The Switch function is a generic function that takes in a type parameter T.
-        /// The Switch function then returns the value of the matches dictionary at key typeof(T).
-        /// This means that if you call Switch&lt;int&gt;(), it will return the value of matches[typeof(int)]().</summary>
-        /// <returns> The value of the function that is associated with the type t.</returns>
+        /// <summary>
+        /// Executes the delegate associated with the generic type argument and returns its result.
+        /// </summary>
+        /// <typeparam name="T">Type key whose registered delegate should be executed.</typeparam>
+        /// <returns>The value produced by the delegate registered for type <typeparamref name="T"/>.</returns>
+        /// <exception cref="KeyNotFoundException">
+        /// Thrown when no delegate has been registered for type <typeparamref name="T"/> and no default exists.
+        /// </exception>
         public O Switch<T>()
         {
             return matches[typeof(T)]();
