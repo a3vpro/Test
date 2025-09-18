@@ -29,6 +29,16 @@ namespace VisionNet.Core.Comparisons
         public static bool InRange<T>(this T value, T lowValue, T upValue)
             where T : IComparable
         {
+            // GUARD: Prevent NullReferenceException by ensuring comparison operands are not null.
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (lowValue == null)
+                throw new ArgumentNullException(nameof(lowValue));
+
+            if (upValue == null)
+                throw new ArgumentNullException(nameof(upValue));
+
             return value.CompareTo(lowValue) >= 0 && value.CompareTo(upValue) <= 0;
         }
 
@@ -43,6 +53,16 @@ namespace VisionNet.Core.Comparisons
         public static bool InRangeExclusive<T>(this T value, T lowValue, T upValue)
         where T : IComparable
         {
+            // GUARD: Prevent NullReferenceException by ensuring comparison operands are not null.
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (lowValue == null)
+                throw new ArgumentNullException(nameof(lowValue));
+
+            if (upValue == null)
+                throw new ArgumentNullException(nameof(upValue));
+
             return value.CompareTo(lowValue) > 0 && value.CompareTo(upValue) < 0;
         }
 
@@ -57,6 +77,16 @@ namespace VisionNet.Core.Comparisons
         public static bool OutRange<T>(this T value, T lowValue, T upValue)
             where T : IComparable
         {
+            // GUARD: Prevent NullReferenceException by ensuring comparison operands are not null.
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (lowValue == null)
+                throw new ArgumentNullException(nameof(lowValue));
+
+            if (upValue == null)
+                throw new ArgumentNullException(nameof(upValue));
+
             return value.CompareTo(lowValue) <= 0 || value.CompareTo(upValue) >= 0;
         }
 
@@ -71,6 +101,16 @@ namespace VisionNet.Core.Comparisons
         public static bool OutRangeExclusive<T>(this T value, T lowValue, T upValue)
         where T : IComparable
         {
+            // GUARD: Prevent NullReferenceException by ensuring comparison operands are not null.
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (lowValue == null)
+                throw new ArgumentNullException(nameof(lowValue));
+
+            if (upValue == null)
+                throw new ArgumentNullException(nameof(upValue));
+
             return value.CompareTo(lowValue) < 0 || value.CompareTo(upValue) > 0;
         }
 
