@@ -16,14 +16,13 @@ namespace VisionNet.Core.Security
     public static class PasswordEncriptDecriptHelper
     {
         /// <summary>
-        /// Encrypts the specified secure password using the provided algorithm.
+        /// Encrypts the contents of the provided <see cref="SecureString"/> using the specified encryption algorithm.
         /// </summary>
-        /// <param name="source">Secure text that must not be <see langword="null"/> and contains the password to protect.</param>
-        /// <param name="encriptMethod">Encryption algorithm to apply; defaults to <see cref="EncriptMethod.Base64"/>.</param>
-        /// <returns>A Base64-encoded cipher text representation of the original secure password.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
-        /// <exception cref="CryptographicException">Thrown when the selected encryption algorithm cannot encrypt the value.</exception>
-        // Encripta una cadena
+        /// <param name="source">Secure string containing the plaintext to encrypt. Must not be <see langword="null"/>; may be empty to produce an empty result.</param>
+        /// <param name="encriptMethod">Encryption strategy to apply. Defaults to <see cref="EncriptMethod.Base64"/>; use <see cref="EncriptMethod.ECB"/> for TripleDES ECB mode.</param>
+        /// <returns>A non-null string containing the encrypted representation of <paramref name="source"/>. The value is empty when the input is empty.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
+        /// <exception cref="System.Security.Cryptography.CryptographicException">Thrown when the encryption provider cannot be initialized or fails while processing <paramref name="source"/> when using <see cref="EncriptMethod.ECB"/>.</exception>
         public static string Encript(this SecureString source, EncriptMethod encriptMethod = EncriptMethod.Base64)
             => new PasswordEncriptDecript().Encript(source, encriptMethod);
 
