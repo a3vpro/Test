@@ -21,24 +21,53 @@ using VisionNet.Core.Exceptions;
 
 namespace VisionNet.Core.Tasks
 {
+    /// <summary>
+    /// Provides a cancellable loop that repeatedly executes the <see cref="Action"/> handler until cancellation or the
+    /// configured iteration limit is reached, forwarding runtime errors through <see cref="ExceptionRaised"/>.
+    /// </summary>
+    /// <remarks>
+    /// The loop increments an internal counter, invokes <see cref="Action"/>, and then waits for <see cref="DelayMs"/>
+    /// milliseconds unless cancellation is requested. The execution stops when <see cref="MaxIterations"/> is reached or
+    /// when <see cref="Stop"/> is called.
+    /// </remarks>
     public class LoopTask : IStartable, IExceptionObservable
     {
         private CancellationTokenSource _cancellation;
         private Task _task;
         private int _taskThreadId;
 
+        /// <summary>
+        /// Gets or sets the maximum number of loop iterations to execute before the task stops automatically; use
+        /// <c>0</c> (default) for an unbounded loop.
+        /// </summary>
         public long MaxIterations { get; set; } = 0;
 
+        /// <summary>
+        /// Gets or sets the delay, in milliseconds, between iterations. Negative values are coerced to <c>0</c>
+        /// before being applied.
+        /// </summary>
         public int DelayMs { get; set; } = 20;
 
+        /// <summary>
+        /// Gets or sets the thread priority applied to the worker thread that runs the loop.
+        /// </summary>
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
 
         #region IStartable
+        /// <summary>
+        /// Gets the lifecycle state of the loop task, allowing callers to determine whether execution is active.
+        /// </summary>
         public ServiceStatus Status { get; protected set; } = ServiceStatus.Stopped;
 
-        
-        /// <summary> The Start function starts the service.</summary>
-        /// <returns> A task object.</returns>
+
+        /// <summary>
+        /// Transitions the loop task to the <see cref="ServiceStatus.Started"/> state and begins executing iterations if
+        /// the task is currently stopped; further calls while running are ignored.
+        /// </summary>
+        /// <remarks>
+        /// Exceptions thrown by iteration handlers are surfaced via <see cref="ExceptionRaised"/> and do not terminate the
+        /// loop unless the observer cancels execution through the provided <see cref="CancellationTokenSource"/>.
+        /// </remarks>
         public void Start()
         {
             if (Status == ServiceStatus.Stopped)
@@ -55,9 +84,14 @@ namespace VisionNet.Core.Tasks
             }
         }
 
-        
-        /// <summary> The Stop function stops the service.</summary>
-        /// <returns> The service status</returns>
+
+        /// <summary>
+        /// Requests cancellation of the loop and transitions the task state to <see cref="ServiceStatus.Stopped"/> if it
+        /// was running.
+        /// </summary>
+        /// <remarks>
+        /// The loop completes the current iteration before respecting the cancellation request.
+        /// </remarks>
         public void Stop()
         {
             if (Status == ServiceStatus.Started)
@@ -68,6 +102,15 @@ namespace VisionNet.Core.Tasks
             }
         }
 
+        /// <summary>
+        /// Blocks the current thread until the internal worker task completes, unless invoked from the same thread that
+        /// runs the loop, in which case an <see cref="InvalidOperationException"/> is reported via
+        /// <see cref="ExceptionRaised"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the worker faulted, waiting may rethrow the first non-cancellation exception encountered.
+        /// </remarks>
+        /// <exception cref="AggregateException">Thrown if the loop completed with an unhandled non-cancellation error.</exception>
         public void Wait()
         {
             // Verifica si el hilo actual es el mismo que inició la tarea.
@@ -96,11 +139,12 @@ namespace VisionNet.Core.Tasks
         #endregion
 
         
-        /// <summary> The LoopTask function is a task that runs in the background and loops until it is cancelled.
-        /// It can be used to run tasks on a regular interval, or for an indefinite amount of time.</summary>
-        /// <param name="maxIterations"> The number of iterations to perform.</param>
-        /// <param name="delayMs"> The delay in milliseconds between iterations.</param>
-        /// <returns> A task object.</returns>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoopTask"/> class with optional iteration and delay
+        /// configuration.
+        /// </summary>
+        /// <param name="maxIterations">Maximum iterations to run before the loop stops automatically; <c>0</c> means no limit.</param>
+        /// <param name="delayMs">Delay in milliseconds between iterations; negative values are treated as <c>0</c>.</param>
         public LoopTask(long maxIterations = 0, int delayMs = 20)
         {
             MaxIterations = maxIterations;
@@ -148,14 +192,20 @@ namespace VisionNet.Core.Tasks
                 RaiseExceptionNotification(this, new ErrorEventArgs(ex));
             }
         }
+        /// <summary>
+        /// Occurs before each delay interval, providing observers access to the shared <see cref="CancellationTokenSource"/>
+        /// so they can perform work and request cancellation when required; handler exceptions are reported via
+        /// <see cref="ExceptionRaised"/>.
+        /// </summary>
         public event EventHandler<EventArgs<CancellationTokenSource>> Action;
 
         #region IExceptionObservable
         /// <summary>
-        /// Raises an exception notification event.
+        /// Raises an exception notification event, forwarding operational faults such as iteration handler errors or invalid
+        /// wait attempts to observers.
         /// </summary>
-        /// <param name="sender">The sender of the event.</param>
-        /// <param name="eventArgs">The event arguments containing the exception data.</param>
+        /// <param name="sender">The originator of the exception.</param>
+        /// <param name="eventArgs">The event arguments that encapsulate the exception instance.</param>
         protected void RaiseExceptionNotification(object sender, ErrorEventArgs eventArgs)
         {
             try
@@ -168,19 +218,25 @@ namespace VisionNet.Core.Tasks
             }
         }
 
+        /// <summary>
+        /// Occurs when the loop encounters an exception, including handler failures and illegal wait operations, allowing
+        /// subscribers to react or log errors.
+        /// </summary>
         public event EventHandler<ErrorEventArgs> ExceptionRaised;
         #endregion
 
-        
-        /// <summary> The StartNew function is a static function that creates a new LoopTask object and starts it.
-        /// The action parameter is an Action delegate that takes in one argument, which is the CancellationTokenSource of the loop task.
-        /// The maxIterations parameter specifies how many times to run the loop before stopping it automatically. If this value is 0, then there will be no limit on how many times to run the loop.</summary>
-        /// <param name="action"> The action to be performed in the loop.</param>
-        /// <param name="maxIterations"> The maximum number of iterations to run. if 0, the loop will continue until cancelled.</param>
-        /// <param name="delayMs"> The delay in milliseconds between each iteration of the loop.</param>
-        /// <returns> An object of type looptask</returns>
+
+        /// <summary>
+        /// Creates, configures, and starts a new <see cref="LoopTask"/> that invokes the specified action on each iteration
+        /// until cancellation or the iteration limit is reached; any handler exceptions are surfaced via
+        /// <see cref="ExceptionRaised"/>.
+        /// </summary>
+        /// <param name="action">Action executed on each iteration with access to the loop's <see cref="CancellationTokenSource"/>.</param>
+        /// <param name="maxIterations">Maximum iterations to run before stopping automatically; <c>0</c> means no limit.</param>
+        /// <param name="delayMs">Delay in milliseconds between iterations; negative values are coerced to <c>0</c>.</param>
+        /// <returns>The started loop task instance.</returns>
         public static LoopTask StartNew(Action<CancellationTokenSource> action, long maxIterations = 0, int delayMs = 20)
-        { 
+        {
             var loopTask = new LoopTask(maxIterations, delayMs);
             loopTask.Action += (s, e) => action?.Invoke(e.Value);
             loopTask.Start();
