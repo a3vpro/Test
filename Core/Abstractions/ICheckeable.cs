@@ -12,21 +12,22 @@
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Defines a contract for objects that can be checked for validity.
+    /// Exposes validation semantics that surface detailed failure information through a typed result payload when checks cannot be satisfied.
     /// </summary>
-    /// <typeparam name="T">The type of the result that is returned from the check, which must derive from <see cref="InvalidCheckResult"/>.</typeparam>
+    /// <typeparam name="T">Structured result type emitted on failure conditions; must derive from <see cref="InvalidCheckResult"/> to convey error metadata.</typeparam>
     public interface ICheckeable<T> where T : InvalidCheckResult
     {
         /// <summary>
-        /// Attempts to perform a check and outputs the result.
+        /// Evaluates the current state and reports whether it satisfies the required invariants, returning detailed diagnostics when it does not.
         /// </summary>
-        /// <param name="result">The result of the check, which is of type <typeparamref name="T"/>.</param>
-        /// <returns>True if the check was successful, otherwise false.</returns>
+        /// <param name="result">Outputs the contextual failure details when the check fails; undefined when the method returns <see langword="true"/>.</param>
+        /// <returns><see langword="true"/> when the implementer meets all validation rules; otherwise <see langword="false"/> and <paramref name="result"/> contains the cause.</returns>
         bool TryCheck(out T result);
 
         /// <summary>
-        /// Performs a check without returning the result. 
+        /// Forces validation and throws an exception if invariants are violated, enabling consumers to rely on exceptions for control flow.
         /// </summary>
+        /// <exception cref="System.InvalidOperationException">Thrown when the implementer is in an invalid state and cannot pass the configured check.</exception>
         void Check();
     }
 }

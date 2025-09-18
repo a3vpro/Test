@@ -12,15 +12,16 @@
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Defines an interface for objects that can be cast to a specified type.
+    /// Provides a strongly-typed conversion contract that allows the implementing instance to expose its value in another compatible representation.
     /// </summary>
     public interface ICasteable
     {
         /// <summary>
-        /// Casts the current object to the specified type.
+        /// Projects the current object into the requested type, typically by returning either the instance itself or an adapted view.
         /// </summary>
-        /// <typeparam name="T">The type to cast the object to.</typeparam>
-        /// <returns>The object cast to the specified type.</returns>
+        /// <typeparam name="T">Target type expected by the caller; must be supported by the implementing instance.</typeparam>
+        /// <returns>The current instance represented as <typeparamref name="T"/>, either via casting or wrapping as defined by the implementation.</returns>
+        /// <exception cref="InvalidCastException">Thrown when the requested cast cannot be satisfied due to an incompatible type.</exception>
         T Cast<T>();
     }
 

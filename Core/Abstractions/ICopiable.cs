@@ -14,14 +14,16 @@ using System;
 namespace VisionNet.Core.Abstractions
 {
     /// <summary>
-    /// Defines an interface for objects that can be copied or cloned.
+    /// Extends cloning semantics by allowing implementations to duplicate their state directly into an existing destination instance.
     /// </summary>
     public interface ICopiable : ICloneable
     {
         /// <summary>
-        /// Clones the current object and copies its data to the specified destination object.
+        /// Copies the full state of the current object into the provided destination reference, overwriting any existing values to ensure both instances remain equivalent.
         /// </summary>
-        /// <param name="destiny">The object that will receive the copied data.</param>
+        /// <param name="destiny">Reference to the target object that should receive the cloned data; must be compatible with the implementer's concrete type.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="destiny"/> references a null target.</exception>
+        /// <exception cref="InvalidCastException">Thrown when the supplied destination cannot be cast to the implementer's concrete type for copying.</exception>
         void CloneTo(ref object destiny);
     }
 
