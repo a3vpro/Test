@@ -17,13 +17,18 @@ using VisionNet.Core.Encoding;
 
 namespace VisionNet.Core.Security
 {
+    /// <summary>
+    /// Provides helpers to encrypt and decrypt passwords backed by <see cref="SecureString"/> values
+    /// using Base64 encoding or a TripleDES cipher in ECB mode.
+    /// </summary>
     public class PasswordEncriptDecript
     {
         private SecureString _securityKey = new SecureString();
 
-        
-        /// <summary> The PasswordEncriptDecript function encrypts and decrypts a password.</summary>
-        /// <returns> A string</returns>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PasswordEncriptDecript"/> class with the
+        /// internal security key used for TripleDES encryption and decryption.
+        /// </summary>
         public PasswordEncriptDecript()
         {
             _securityKey.AppendChar('S');
@@ -39,10 +44,15 @@ namespace VisionNet.Core.Security
 
         // Encripta una cadena
         
-        /// <summary> The Encript function takes a SecureString and returns an encrypted string.</summary>
-        /// <param name="source"> The string to be decrypted</param>
-        /// <param name="encriptMethod"> Encriptmethod encriptmethod</param>
-        /// <returns> A string</returns>
+        /// <summary>
+        /// Encrypts the provided password using the selected algorithm, returning the result as a
+        /// Base64-encoded string.
+        /// </summary>
+        /// <param name="source">The plain-text password stored in a <see cref="SecureString"/>. The value must not be <c>null</c>.</param>
+        /// <param name="encriptMethod">Selects the encryption algorithm: Base64 encoding or TripleDES in ECB mode with PKCS7 padding.</param>
+        /// <returns>A Base64 string that represents the encrypted password.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <c>null</c>.</exception>
+        /// <exception cref="CryptographicException">Thrown when the TripleDES provider cannot be created or encryption fails when using the ECB mode.</exception>
         public string Encript(SecureString source, EncriptMethod encriptMethod = EncriptMethod.Base64)
         {
             switch (encriptMethod)
@@ -78,15 +88,16 @@ namespace VisionNet.Core.Security
             }
         }
 
-        /// Esta función desencripta la cadena que le envíamos en el parámentro de entrada.
-        
-        /// <summary> The Decript function takes a string and an EncriptMethod enum as parameters.
-        /// The function then uses the switch statement to determine which encription method was used.
-        /// If the Base64 encription method is used, it will return a SecureString object that contains 
-        /// the decrypted string.</summary>
-        /// <param name="source"> The string to be decrypted</param>
-        /// <param name="encriptMethod"> The type of encription to use.  default is base64</param>
-        /// <returns> A securestring</returns>
+        /// <summary>
+        /// Decrypts an encrypted password using the specified algorithm and restores it into a
+        /// <see cref="SecureString"/> instance.
+        /// </summary>
+        /// <param name="source">The Base64 string produced by <see cref="Encript(SecureString, EncriptMethod)"/>.</param>
+        /// <param name="encriptMethod">Identifies the encryption algorithm that was used to produce <paramref name="source"/>.</param>
+        /// <returns>A <see cref="SecureString"/> that contains the decrypted plain-text password.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">Thrown when <paramref name="source"/> is not valid Base64.</exception>
+        /// <exception cref="CryptographicException">Thrown when the TripleDES provider cannot be created or decryption fails when using the ECB mode.</exception>
         public SecureString Decript(string source, EncriptMethod encriptMethod = EncriptMethod.Base64)
         {
             switch (encriptMethod)
