@@ -15,6 +15,11 @@ using System.Linq;
 
 namespace VisionNet.Core.Tags
 {
+    /// <summary>
+    /// Provides a mutable container for tag definitions so callers can attach the strongly
+    /// typed tag metadata defined by the constants in this namespace to domain objects and
+    /// later query their presence.
+    /// </summary>
     public class Tags<T> : ITaggable<T>, IReadonlyTaggable<T>
     {
         protected List<T> _tagList = new List<T>();
