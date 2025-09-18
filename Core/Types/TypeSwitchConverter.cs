@@ -14,38 +14,47 @@ using System.Collections.Generic;
 
 namespace VisionNet.Core.Types
 {
+    /// <summary>
+    /// Provides type-based dispatch to convert runtime values into a common target type.
+    /// Each registered case associates a specific runtime <see cref="Type"/> with a conversion delegate.
+    /// </summary>
+    /// <typeparam name="O">The conversion target type returned for every successful match.</typeparam>
     public class TypeSwitchConverter<O>
     {
         Dictionary<Type, Func<object, O>> matches = new Dictionary<Type, Func<object, O>>();
 
-        /// <summary> The Case function adds a new case to the switch statement.
-        /// The first parameter is the type of object that will be matched, and
-        /// the second parameter is a function that takes an object of type T and returns 
-        /// an object of type O.</summary>
-        /// <param name="Func&lt;object"> The type of the object.</param>
-        /// <param name="func"> </param>
-        /// <returns> A typeswitchconverter object.</returns>
+        /// <summary>
+        /// Registers a conversion delegate that handles values whose runtime type exactly matches <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The runtime type that will trigger the provided conversion delegate.</typeparam>
+        /// <param name="func">Conversion delegate executed when an input instance of type <typeparamref name="T"/> is processed.</param>
+        /// <returns>The current converter to allow fluent configuration.</returns>
+        /// <exception cref="ArgumentException">Thrown when a conversion for <typeparamref name="T"/> has already been registered.</exception>
         public TypeSwitchConverter<O> Case<T>(Func<object, O> func)
         {
             matches.Add(typeof(T), (x) => func(x));
             return this;
         }
 
-        /// <summary> The Default function is used to set the default case for a TypeSwitch.
-        /// If no other cases are matched, this function will be called.</summary>
-        /// <param name="Func&lt;object"> The func&amp;lt;object, o&gt; is a delegate that represents the method that will handle the conversion.</param>
-        /// <param name="func"> The function to exectute </param>
-        /// <returns> An object of type o.</returns>
+        /// <summary>
+        /// Registers a conversion delegate intended to act as a fallback when no other explicit type matches are available.
+        /// </summary>
+        /// <param name="func">Conversion delegate used when the runtime type does not have a dedicated registration.</param>
+        /// <returns>The current converter to allow fluent configuration.</returns>
+        /// <exception cref="ArgumentException">Thrown when a default conversion has already been registered.</exception>
         public TypeSwitchConverter<O> Default(Func<object, O> func)
         {
             matches.Add(typeof(object), (x) => func(x));
             return this;
         }
 
-        /// <summary> The Switch function is a pattern matching function that takes an object and returns the result of the first match found.
-        /// The matches are defined in a dictionary, where each key is a type and each value is an action to perform on that type.</summary>
-        /// <param name="x"> The object to be matched</param>
-        /// <returns> The value of the function that matches the type of x.</returns>
+        /// <summary>
+        /// Executes the conversion delegate registered for the exact runtime type of the supplied value and returns its result.
+        /// </summary>
+        /// <param name="x">Value to convert into the target type <typeparamref name="O"/>.</param>
+        /// <returns>The conversion result produced by the matching delegate.</returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="x"/> is <see langword="null"/>.</exception>
+        /// <exception cref="KeyNotFoundException">Thrown when no conversion delegate has been registered for <paramref name="x"/>'s runtime type.</exception>
         public O Switch(object x)
         {
             return matches[x.GetType()](x);
