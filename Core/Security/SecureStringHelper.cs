@@ -23,15 +23,26 @@ namespace VisionNet.Core.Security
         /// <returns>A managed string containing the decrypted value of <paramref name="source"/>. Returns <see cref="string.Empty"/> when the secure string is empty.</returns>
         /// <exception cref="ObjectDisposedException">Thrown when <paramref name="source"/> has already been disposed.</exception>
         /// <remarks>The resulting string resides in managed memory and should be handled carefully to avoid lingering sensitive data.</remarks>
+        /// Converts the contents of a <see cref="SecureString"/> to a plain <see cref="string"/> by
+        /// leveraging <see cref="NetworkCredential"/> to unwrap the protected value. The resulting
+        /// string resides in managed memory and should be cleared or disposed promptly to avoid
+        /// leaving sensitive data accessible.
+        /// </summary>
+        /// <param name="source">The secure text to convert. The value must not be <see langword="null"/> and must not have been disposed.</param>
+        /// <returns>The plaintext representation of <paramref name="source"/>; returns <see cref="string.Empty"/> when the secure string is empty.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ObjectDisposedException">Thrown when <paramref name="source"/> has already been disposed.</exception>
         public static string FromSecureString(this SecureString source) => new NetworkCredential("", source).Password;
 
         /// <summary>
-        /// Converts the specified <see cref="string"/> into a new <see cref="SecureString"/> by assigning it through <see cref="NetworkCredential"/>.
+        /// Converts a plaintext <see cref="string"/> into a <see cref="SecureString"/> by assigning the
+        /// value to a <see cref="NetworkCredential"/> and retrieving its protected representation. The
+        /// caller is responsible for disposing the returned secure string to release the sensitive data
+        /// from memory.
         /// </summary>
-        /// <param name="source">Plain text value to protect. May be <see langword="null"/>, in which case an empty secure string is returned.</param>
-        /// <returns>A new <see cref="SecureString"/> instance whose contents mirror <paramref name="source"/>.</returns>
-        /// <exception cref="OutOfMemoryException">Thrown when the runtime cannot allocate the secure string.</exception>
-        /// <remarks>The caller is responsible for disposing the returned secure string as soon as it is no longer required.</remarks>
+        /// <param name="source">The plaintext value to convert. A <see langword="null"/> value results in an empty <see cref="SecureString"/>.</param>
+        /// <returns>A new <see cref="SecureString"/> containing the characters from <paramref name="source"/>; the caller must dispose the instance when finished.</returns>
+        /// <remarks>No exceptions are thrown; a <see langword="null"/> input produces an empty secure string.</remarks>
         public static SecureString ToSecureString(this string source) => new NetworkCredential("", source).SecurePassword;
 
         
