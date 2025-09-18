@@ -22,6 +22,10 @@ using VisionNet.Core.Exceptions;
 
 namespace VisionNet.Core.Tasks
 {
+    /// <summary>
+    /// Orchestrates ordered <see cref="SequenceItem"/> instances, honouring per-item delays until cancellation or the configured iteration limit is reached.
+    /// Exceptions raised by sequence actions are published through the <see cref="ExceptionRaised"/> event.
+    /// </summary>
     public class SequenceTask : IStartable, IExceptionObservable
     {
         private CancellationTokenSource _cancellation;
@@ -30,28 +34,44 @@ namespace VisionNet.Core.Tasks
         protected List<SequenceItem> _sequences = new List<SequenceItem>();
         private long _accumulatedDelay = 0;
 
+        /// <summary>
+        /// Gets or sets the total number of full sequence cycles to execute before stopping automatically; a value of <c>0</c> allows the sequence to continue indefinitely.
+        /// </summary>
         public long MaxIterations { get; set; } = 0;
 
+        /// <summary>
+        /// Gets the stopwatch that coordinates the timing for the running sequence.
+        /// Returns <see langword="null"/> until the sequence has been started.
+        /// </summary>
         public IReadonlyStopwatch Stopwatch { get; protected set; }
 
+        /// <summary>
+        /// Gets or sets the thread priority applied to the background worker that executes the sequence.
+        /// </summary>
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
 
 
         #region IStartable
+        /// <summary>
+        /// Gets the lifecycle status of the sequence execution service.
+        /// </summary>
         public ServiceStatus Status { get; protected set; } = ServiceStatus.Stopped;
 
         
-        /// <summary> The Start function starts the VisionNet service.</summary>
-        /// <returns> The task that is created.</returns>
+        /// <summary>
+        /// Starts the sequence execution service using an internally managed stopwatch.
+        /// Exceptions encountered while executing sequence items are published via <see cref="ExceptionRaised"/>.
+        /// </summary>
         public void Start()
         {
             Start(null);
         }
 
-        /// <summary> The Start function starts the service.</summary>
-        /// <param name="stopwatch">     the stopwatch to use for timing the service. if null, a new facadestopwatch will be created and used.
-        /// </param>
-        /// <returns> A task that is started and running. </returns>
+        /// <summary>
+        /// Starts executing the configured sequence items, preserving their ordering and respecting configured delays.
+        /// </summary>
+        /// <param name="stopwatch">A stopwatch instance that synchronises execution timing; when <see langword="null"/>, a new stopwatch is created and started.</param>
+        /// <remarks>Exceptions thrown by sequence actions are surfaced through the <see cref="ExceptionRaised"/> event.</remarks>
         public void Start(IReadonlyStopwatch stopwatch)
         {
             if (Status == ServiceStatus.Stopped && _sequences.Count() > 0)
@@ -74,8 +94,10 @@ namespace VisionNet.Core.Tasks
         }
 
         
-        /// <summary> The Stop function stops the service.</summary>
-        /// <returns> The status of the service.</returns>
+        /// <summary>
+        /// Requests cancellation of the sequence execution service and transitions the status to <see cref="ServiceStatus.Stopped"/>.
+        /// </summary>
+        /// <remarks>The current sequence iteration completes before shutdown; any exceptions continue to be reported via <see cref="ExceptionRaised"/>.</remarks>
         public void Stop()
         {
             if (Status == ServiceStatus.Started)
@@ -85,6 +107,11 @@ namespace VisionNet.Core.Tasks
             }
         }
 
+        /// <summary>
+        /// Waits for the background execution thread to complete after cancellation or natural termination.
+        /// </summary>
+        /// <exception cref="AggregateException">Thrown when the underlying task faults with exceptions other than cancellation.</exception>
+        /// <remarks>Attempting to wait from the executing thread triggers an <see cref="InvalidOperationException"/> published via <see cref="ExceptionRaised"/>.</remarks>
         public void Wait()
         {
             // Verifica si el hilo actual es el mismo que inició la tarea.
@@ -117,12 +144,12 @@ namespace VisionNet.Core.Tasks
         {
         }
         
-        /// <summary> The SequenceTask function is a constructor that takes in a list of sequences and the maximum number of iterations.
-        /// If the maxIterations parameter is not specified, it defaults to 0.</summary>
-        /// <param name="sequences"> List of sequences to be executed</param>
-        /// <param name="maxIterations"> The maximum number of iterations to run the sequence. 
-        /// if 0, then it will run indefinitely.</param>
-        /// <returns> A list of sequences which are the result of the execution</returns>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SequenceTask"/> class with the provided sequence items and optional iteration limit.
+        /// </summary>
+        /// <param name="sequences">The ordered collection of sequence items to execute sequentially, each with its configured delay and action.</param>
+        /// <param name="maxIterations">The maximum number of times the entire sequence list is repeated before stopping automatically; specify <c>0</c> to repeat indefinitely.</param>
+        /// <exception cref="ArgumentException"><paramref name="sequences"/> is <see langword="null"/>.</exception>
         public SequenceTask(List<SequenceItem> sequences, long maxIterations = 0)
         {
             //if (sequences == null || sequences.Count == 0)
@@ -194,10 +221,11 @@ namespace VisionNet.Core.Tasks
 
         #region IExceptionObservable
         
-        /// <summary> The RaiseExceptionNotification function is used to raise an exception notification event.</summary>
-        /// <param name="sender"> </param>
-        /// <param name="eventArgs"> What is this parameter used for?</param>
-        /// <returns> The exceptionraised event.</returns>
+        /// <summary>
+        /// Raises the <see cref="ExceptionRaised"/> event while protecting the notifier from observer exceptions.
+        /// </summary>
+        /// <param name="sender">The originator of the notification.</param>
+        /// <param name="eventArgs">The event data describing the exception encountered.</param>
         protected void RaiseExceptionNotification(object sender, ErrorEventArgs eventArgs)
         {
             try
@@ -210,17 +238,21 @@ namespace VisionNet.Core.Tasks
             }
         }
 
+        /// <summary>
+        /// Occurs when an exception happens during sequence execution or lifecycle operations.
+        /// </summary>
         public event EventHandler<ErrorEventArgs> ExceptionRaised;
         #endregion
 
         
-        /// <summary> The StartNew function starts a new sequence task.</summary>
-        /// <param name="sequences"> The list of sequences to be executed.</param>
-        /// <param name="maxIterations"> The maximum number of iterations to run the sequence for. if 0, it will run indefinitely.</param>
-        /// <param name="stopwatch"> The stopwatch is used to measure the time of each sequence item. 
-        /// if no stopwatch is provided, a new one will be created and started automatically. 
-        /// </param>
-        /// <returns> A &lt;see cref=&quot;sequencetask&quot;/&gt; object.</returns>
+        /// <summary>
+        /// Creates and immediately starts a new <see cref="SequenceTask"/> for the provided sequence items.
+        /// </summary>
+        /// <param name="sequences">The ordered collection of sequence items to execute sequentially.</param>
+        /// <param name="maxIterations">The maximum number of completed sequence cycles before stopping automatically; use <c>0</c> to continue indefinitely.</param>
+        /// <param name="stopwatch">An optional stopwatch shared with other services for timing; when omitted, a new internal stopwatch is created and started.</param>
+        /// <returns>The started <see cref="SequenceTask"/> instance controlling the sequence execution.</returns>
+        /// <exception cref="ArgumentException"><paramref name="sequences"/> is <see langword="null"/>.</exception>
         public static SequenceTask StartNew(List<SequenceItem> sequences, long maxIterations = 0, IReadonlyStopwatch stopwatch = null)
         {
             var sequenceTask = new SequenceTask(sequences, maxIterations);
