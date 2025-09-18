@@ -332,6 +332,12 @@ namespace VisionNet.Core.Patterns
         }
 
         // Implementación explícita de INotifyPropertyChanged para ReactiveUI
+        /// <summary>
+        /// Occurs when the collection reports a property change, either because the number of
+        /// items has changed or because an item within the collection has raised a property
+        /// change that is re-emitted with the item's index. The event arguments provide the
+        /// property name that changed, such as <c>"Count"</c> or <c>"[index].Property"</c>.
+        /// </summary>
         public new event PropertyChangedEventHandler PropertyChanged;
 
         // Método modificado para ser protected y virtual
