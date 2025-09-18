@@ -16,31 +16,43 @@ using VisionNet.Core.Events;
 
 namespace VisionNet.Core.States
 {
+    /// <summary>
+    /// Provides validation for state transitions by registering allowed transitions and emitting notifications when a transition occurs.
+    /// </summary>
+    /// <typeparam name="T">Type that represents the state identifier. It must provide value equality semantics.</typeparam>
     public class StatusValidator<T>
     {
         private DictionaryOfList<T, T> _transitions = new DictionaryOfList<T, T>();
 
+        /// <summary>
+        /// Registers an allowed transition from a source state to a destination state.
+        /// </summary>
+        /// <param name="source">State that acts as the origin of the transition. Must be a key recognizable by the validator.</param>
+        /// <param name="destiny">State that can be reached from the specified source state.</param>
         public void AddTransition(T source, T destiny) =>
             _transitions.Add(source, destiny);
 
-        
-        /// <summary> The IsValidTransition function checks if the source state is in the transitions dictionary, and then checks if any of those transition states are equal to the destiny state.</summary>
-        /// <param name="source"> The source state</param>
-        /// <param name="destiny"> The destiny state.</param>
-        /// <returns> A bool value.</returns>
+
+        /// <summary>
+        /// Determines whether the specified destination state is a valid transition target for the provided source state.
+        /// </summary>
+        /// <param name="source">State currently assigned to the entity being validated.</param>
+        /// <param name="destiny">State requested as the next state.</param>
+        /// <returns><see langword="true"/> when the destination state has been registered as reachable from the source state; otherwise, <see langword="false"/>.</returns>
         public bool IsValidTransition(T source, T destiny)
         {
             return _transitions.ContainsKey(source) &&
                 _transitions[source].Any(v => v.Equals(destiny));
         }
 
-        
-        /// <summary> The GoToState function is used to transition from one state to another.
-        /// It will only allow the transition if it is a valid one, otherwise it will return the current state.</summary>
-        /// <param name="source"> The current state.</param>
-        /// <param name="destiny"> The destiny state</param>
-        /// <param name="action"> The action to be executed when the state changes.</param>
-        /// <returns> The destiny state. if the transition is not valid, it returns the source state.</returns>
+
+        /// <summary>
+        /// Attempts to move from the specified source state to the destination state and invokes an optional action when the transition is valid.
+        /// </summary>
+        /// <param name="source">Current state prior to evaluating the transition.</param>
+        /// <param name="destiny">Target state requested for the transition.</param>
+        /// <param name="action">Optional callback executed after a successful transition and before raising <see cref="StatusChanged"/>.</param>
+        /// <returns>The destination state when the transition is valid; otherwise, returns the original source state.</returns>
         public T GoToState(T source, T destiny, Action action = null)
         {
             if (IsValidTransition(source, destiny))
@@ -53,13 +65,14 @@ namespace VisionNet.Core.States
                 return source;
         }
 
-        
-        /// <summary> The TryGoToState function attempts to transition the state machine from one state to another.
-        /// If the transition is valid, it will execute an action and raise a StatusChanged event.</summary>
-        /// <param name="source"> The current state of the object.</param>
-        /// <param name="destiny"> The destiny state</param>
-        /// <param name="action"> What is this parameter used for?</param>
-        /// <returns> A boolean value. it returns true if the transition was successful, otherwise it returns false.</returns>
+
+        /// <summary>
+        /// Tries to perform a transition by updating the referenced source state when the transition is valid and emitting the corresponding notifications.
+        /// </summary>
+        /// <param name="source">Reference to the variable that stores the current state. It is overwritten when the transition succeeds.</param>
+        /// <param name="destiny">State requested as the next state for the referenced source.</param>
+        /// <param name="action">Optional callback executed after a successful transition and before raising <see cref="StatusChanged"/>.</param>
+        /// <returns><see langword="true"/> when the state was updated to the destination state; otherwise, <see langword="false"/>.</returns>
         public bool TryGoToState(ref T source, T destiny, Action action = null)
         {
             var result = IsValidTransition(source, destiny);
@@ -74,12 +87,7 @@ namespace VisionNet.Core.States
             return result;
         }
 
-        
-        /// <summary> The RaiseStatusChanged function is a helper function that raises the StatusChanged event.
-        /// It catches any exceptions thrown by the event handlers and ignores them.</summary>
-        /// <param name="sender"> The object that raised the event</param>
-        /// <param name="eventArgs"> What is this?</param>
-        /// <returns> A void.</returns>
+
         protected void RaiseStatusChanged(object sender, EventArgs<T> eventArgs)
         {
             try
@@ -90,6 +98,9 @@ namespace VisionNet.Core.States
             {
             }
         }
+        /// <summary>
+        /// Occurs after a successful transition, providing the destination state to subscribers.
+        /// </summary>
         public event EventHandler<EventArgs<T>> StatusChanged;
 
     }
