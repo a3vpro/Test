@@ -32,6 +32,12 @@ namespace VisionNet.Core.Attributes
         public static bool ClassHasAttribute<T>(this object obj)
             where T : Attribute
         {
+            if (obj == null)
+            {
+                // GUARD: Prevent null object reflection calls.
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             return obj.GetType()
                 .ClassHasAttribute<T>();
         }
@@ -47,6 +53,12 @@ namespace VisionNet.Core.Attributes
         public static bool ClassHasAttribute<T>(this Type type)
             where T : Attribute
         {
+            if (type == null)
+            {
+                // GUARD: Prevent null type reflection calls.
+                throw new ArgumentNullException(nameof(type));
+            }
+
             return type
                 .GetCustomAttributes(true)
                 .OfType<T>()
@@ -65,6 +77,18 @@ namespace VisionNet.Core.Attributes
         public static bool MethodHasAttribute<T>(this object obj, string methodName)
             where T : Attribute
         {
+            if (obj == null)
+            {
+                // GUARD: Prevent null object reflection calls.
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (methodName == null)
+            {
+                // GUARD: Prevent null method names when using reflection.
+                throw new ArgumentNullException(nameof(methodName));
+            }
+
             return obj.GetType()
                 .MethodHasAttribute<T>(methodName);
         }
@@ -81,6 +105,18 @@ namespace VisionNet.Core.Attributes
         public static bool MethodHasAttribute<T>(this Type type, string methodName)
             where T : Attribute
         {
+            if (type == null)
+            {
+                // GUARD: Prevent null type reflection calls.
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (methodName == null)
+            {
+                // GUARD: Prevent null method names when using reflection.
+                throw new ArgumentNullException(nameof(methodName));
+            }
+
             var methodInfo = type.GetMethod(methodName);
             return methodInfo != null && methodInfo
                 .GetCustomAttributes(true)
@@ -100,6 +136,18 @@ namespace VisionNet.Core.Attributes
         public static bool PropertyHasAttribute<T>(this object obj, string propertyName)
             where T : Attribute
         {
+            if (obj == null)
+            {
+                // GUARD: Prevent null object reflection calls.
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (propertyName == null)
+            {
+                // GUARD: Prevent null property names when using reflection.
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
             return obj.GetType()
                 .PropertyHasAttribute<T>(propertyName);
         }
@@ -116,6 +164,18 @@ namespace VisionNet.Core.Attributes
         public static bool PropertyHasAttribute<T>(this Type type, string propertyName)
             where T : Attribute
         {
+            if (type == null)
+            {
+                // GUARD: Prevent null type reflection calls.
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (propertyName == null)
+            {
+                // GUARD: Prevent null property names when using reflection.
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
             var propertyInfo = type.GetProperty(propertyName);
             return propertyInfo != null && propertyInfo
                 .GetCustomAttributes(true)
@@ -135,6 +195,12 @@ namespace VisionNet.Core.Attributes
         public static Dictionary<MethodInfo, List<T>> GetMethodsWithAttribute<T>(this object obj)
             where T : Attribute
         {
+            if (obj == null)
+            {
+                // GUARD: Prevent null object reflection calls.
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             return obj.GetType()
                 .GetMethodsWithAttribute<T>();
         }
@@ -151,6 +217,12 @@ namespace VisionNet.Core.Attributes
         public static Dictionary<MethodInfo, List<T>> GetMethodsWithAttribute<T>(this Type type)
             where T : Attribute
         {
+            if (type == null)
+            {
+                // GUARD: Prevent null type reflection calls.
+                throw new ArgumentNullException(nameof(type));
+            }
+
             return type.GetMethods()
                 .Select(m =>
                     new
@@ -174,6 +246,12 @@ namespace VisionNet.Core.Attributes
         public static Dictionary<MethodInfo, T> GetFirstMethodWithAttribute<T>(this object obj)
             where T : Attribute
         {
+            if (obj == null)
+            {
+                // GUARD: Prevent null object reflection calls.
+                throw new ArgumentNullException(nameof(obj));
+            }
+
             return obj.GetType()
                 .GetFirstMethodWithAttribute<T>();
         }
@@ -190,6 +268,12 @@ namespace VisionNet.Core.Attributes
         public static Dictionary<MethodInfo, T> GetFirstMethodWithAttribute<T>(this Type type)
             where T : Attribute
         {
+            if (type == null)
+            {
+                // GUARD: Prevent null type reflection calls.
+                throw new ArgumentNullException(nameof(type));
+            }
+
             return type.GetMethods()
                 .Select(m =>
                     new
