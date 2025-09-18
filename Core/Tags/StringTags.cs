@@ -14,24 +14,27 @@ using System.Linq;
 
 namespace VisionNet.Core.Tags
 {
+    /// <summary>
+    /// Maintains a collection of string tags while normalizing all stored values to lowercase for case-insensitive lookups.
+    /// </summary>
     public class StringTags: Tags<string>, IStringTaggable
     {
-        
-        /// <summary> The AddRawTag function takes a string and splits it into an array of strings, then converts each element to lowercase.
-        /// The function then assigns the resulting list to the _tagList variable.</summary>
-        /// <param name="tag"> The tag to add.</param>
-        /// <param name="separator"> The separator is the character that will be used to split the string into a list of strings.
-        /// </param>
-        /// <returns> A list of strings</returns>
+        /// <summary>
+        /// Replaces the current tag list with the entries produced by splitting the supplied raw tag string.
+        /// Every extracted tag is normalized to lowercase to provide case-insensitive comparisons.
+        /// </summary>
+        /// <param name="tag">Raw text containing one or more tags separated by <paramref name="separator" />.</param>
+        /// <param name="separator">Character used to delimit individual tags within <paramref name="tag" />.</param>
         public void AddRawTag(string tag, char separator)
         {
             _tagList = tag.Split(separator).Select(t => t.ToLower()).ToList();
         }
 
-        
-        /// <summary> The AddTag function adds a tag to the _tagList list if it does not already exist.</summary>
-        /// <param name="tag"> The tag to be added.</param>
-        /// <returns> A list of tags</returns>
+
+        /// <summary>
+        /// Adds a single tag to the collection after normalizing it to lowercase, ignoring duplicates.
+        /// </summary>
+        /// <param name="tag">Tag text to add. The value is normalized to lowercase before storage.</param>
         public override void AddTag(string tag)
         {
             var strTag = tag.ToLower();
@@ -39,11 +42,11 @@ namespace VisionNet.Core.Tags
                 _tagList.Add(strTag);
         }
 
-        
-        /// <summary> The AddTags function adds tags to the _tagList list.</summary>
-        /// <param name="tags"> The params keyword is used to specify that a method parameter should be treated as an array. 
-        /// </param>
-        /// <returns> A list of strings.</returns>
+
+        /// <summary>
+        /// Adds multiple tags to the collection, normalizing each value to lowercase and avoiding duplicates.
+        /// </summary>
+        /// <param name="tags">Tag values to add. Each entry is normalized to lowercase before storage.</param>
         public override void AddTags(params string[] tags)
         {
             var strTags = tags.Select(t => t.ToLower());
@@ -53,46 +56,54 @@ namespace VisionNet.Core.Tags
                     _tagList.Add(strTag);
         }
 
-        
-        /// <summary> The HasAllTags function checks if the current object has all of the tags passed in as parameters.</summary>
-        /// <param name="tags"> The tags to check for.</param>
-        /// <returns> A boolean value. it returns true if all of the tags are present in the tag list.</returns>
+
+        /// <summary>
+        /// Determines whether every provided tag is present in the current collection after lowercase normalization.
+        /// </summary>
+        /// <param name="tags">Tags to verify. Each entry is normalized to lowercase before comparison.</param>
+        /// <returns><see langword="true" /> when all normalized tags exist in the collection; otherwise, <see langword="false" />.</returns>
         public override bool HasAllTags(params string[] tags)
         {
             return tags.All(t => _tagList.Contains(t.ToLower()));
         }
 
-        
-        /// <summary> The HasAnyTag function checks if the current object has any of the tags passed in as parameters.</summary>
-        /// <param name="tags"> The tags to check for</param>
-        /// <returns> A boolean value.</returns>
+
+        /// <summary>
+        /// Determines whether at least one of the provided tags exists in the current collection after lowercase normalization.
+        /// </summary>
+        /// <param name="tags">Tags to verify. Each entry is normalized to lowercase before comparison.</param>
+        /// <returns><see langword="true" /> when any normalized tag exists in the collection; otherwise, <see langword="false" />.</returns>
         public override bool HasAnyTag(params string[] tags)
         {
             return tags.Any(t => _tagList.Contains(t.ToLower()));
         }
 
-        
-        /// <summary> The HasTag function checks if the tag is in the list of tags.</summary>
-        /// <param name="tag"> The tag to be added.</param>
-        /// <returns> True if the tag is contained in the _taglist, otherwise it returns false.</returns>
+
+        /// <summary>
+        /// Determines whether the specified tag exists in the collection after normalization to lowercase.
+        /// </summary>
+        /// <param name="tag">Tag to verify. The value is normalized to lowercase before comparison.</param>
+        /// <returns><see langword="true" /> when the normalized tag exists in the collection; otherwise, <see langword="false" />.</returns>
         public override bool HasTag(string tag)
         {
             return _tagList.Contains(tag.ToLower());
         }
 
-        
-        /// <summary> The RemoveTag function removes a tag from the list of tags.</summary>
-        /// <param name="tag"> The tag to be removed</param>
-        /// <returns> A boolean value.</returns>
+
+        /// <summary>
+        /// Removes the specified tag from the collection after normalizing it to lowercase.
+        /// </summary>
+        /// <param name="tag">Tag to remove. The value is normalized to lowercase before removal.</param>
         public override void RemoveTag(string tag)
         {
             _tagList.Remove(tag.ToLower());
         }
 
-        
-        /// <summary> The RemoveTags function removes all tags from the tag list that match any of the strings passed in as parameters.</summary>
-        /// <param name="tags"> The tags to remove from the list.</param>
-        /// <returns> The list of tags that were removed.</returns>
+
+        /// <summary>
+        /// Removes each supplied tag from the collection after normalizing the values to lowercase.
+        /// </summary>
+        /// <param name="tags">Tags to remove. Each entry is normalized to lowercase before comparison.</param>
         public override void RemoveTags(params string[] tags)
         {
             var strTags = tags.Select(t => t.ToLower());
