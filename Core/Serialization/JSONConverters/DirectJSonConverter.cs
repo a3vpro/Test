@@ -16,6 +16,11 @@ using Newtonsoft.Json.Serialization;
 
 namespace VisionNet.Core.Serialization
 {
+    /// <summary>
+    /// Provides a JSON converter that directly creates and populates instances of <typeparamref name="T"/>,
+    /// bypassing any registered type converters to avoid recursion when deserializing.
+    /// </summary>
+    /// <typeparam name="T">The target type that must expose a public parameterless constructor.</typeparam>
     public class DirectJSonConverter<T> : JsonConverter
         where T: new()
     {
@@ -41,23 +46,28 @@ namespace VisionNet.Core.Serialization
         }
 
         
-        /// <summary> The CanConvert function is used to determine if the converter can convert a given type.
-        /// This function is called by JsonSerializer when it needs to know if this converter can handle a given type.</summary>
-        /// <param name="objectType"> The type of the object to convert.
-        /// </param>
-        /// <returns> True if the objecttype parameter is of type t or a derived class. otherwise, it returns false.</returns>
+        /// <summary>
+        /// Determines whether the converter can convert instances of the provided <paramref name="objectType"/>.
+        /// </summary>
+        /// <param name="objectType">The runtime type that the serializer is attempting to convert.</param>
+        /// <returns>
+        /// <see langword="true"/> when <typeparamref name="T"/> is assignable from <paramref name="objectType"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool CanConvert(Type objectType)
         {
             return typeof(T).IsAssignableFrom(objectType);
         }
 
-        
-        /// <summary> The ReadJson function is used to deserialize JSON text into an object or value.</summary>
-        /// <param name="reader"> The jsonreader to read from.</param>
-        /// <param name="objectType"> The type of the object.</param>
-        /// <param name="existingValue"> The existing value of object being read.</param>
-        /// <param name="serializer"> The jsonserializer used to deserialize the object.</param>
-        /// <returns> The item object.</returns>
+
+        /// <summary>
+        /// Creates a new instance of <typeparamref name="T"/> and populates it with values read from the provided JSON reader.
+        /// </summary>
+        /// <param name="reader">The <see cref="JsonReader"/> that provides the JSON payload.</param>
+        /// <param name="objectType">The target CLR type for the deserialization request.</param>
+        /// <param name="existingValue">An existing value supplied by the serializer; ignored by this converter.</param>
+        /// <param name="serializer">The serializer orchestrating the deserialization process.</param>
+        /// <returns>A fully populated <typeparamref name="T"/> instance.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jo = JObject.Load(reader);
@@ -68,16 +78,20 @@ namespace VisionNet.Core.Serialization
             return item;
         }
 
+        /// <summary>
+        /// Gets a value indicating that the converter supports writing so that the serializer will invoke
+        /// <see cref="WriteJson(JsonWriter, object, JsonSerializer)"/> when serializing instances of <typeparamref name="T"/>.
+        /// </summary>
         public override bool CanWrite => true;
 
-        
-        /// <summary> The WriteJson function is used to serialize an object into a JSON string.</summary>
-        /// <param name="writer"> The jsonwriter writer is used to write the json data.
-        /// </param>
-        /// <param name="value"> The object to serialize.</param>
-        /// <param name="serializer"> The jsonserializer is used to serialize the object.
-        /// </param>
-        /// <returns> A jsonwriter object.</returns>
+
+        /// <summary>
+        /// Serializes the supplied <paramref name="value"/> by delegating to the configured serializer while enforcing the
+        /// converter's contract resolver to bypass type converters during serialization.
+        /// </summary>
+        /// <param name="writer">The <see cref="JsonWriter"/> receiving the JSON output.</param>
+        /// <param name="value">The object instance to serialize.</param>
+        /// <param name="serializer">The serializer orchestrating the serialization process.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             serializer.ContractResolver = resolver;
