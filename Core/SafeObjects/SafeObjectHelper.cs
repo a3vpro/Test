@@ -62,12 +62,33 @@ namespace VisionNet.Core.SafeObjects
         }
 
         
-        /// <summary> The TryChangeType function attempts to convert the value parameter to the conversionType type. If it fails, it will attempt to convert using CultureInfo.CurrentCulture.</summary>
-        /// <param name="value"> The value to be converted.</param>
-        /// <param name="conversionType"> The type to convert the value to.</param>
-        /// <param name="result"> The result of the conversion.</param>
-        /// <param name="defaultValue"> The default value to return if the conversion fails.</param>
-        /// <returns> A boolean value. if the conversion is successful, the result parameter contains a converted value and true is returned. otherwise, false is returned.</returns>
+        /// <summary>
+        /// Attempts to convert <paramref name="value"/> to the specified <paramref name="conversionType"/> using <see cref="Convert.ChangeType(object, Type)"/> and,
+        /// when the input is textual, retries the conversion with <see cref="CultureInfo.CurrentCulture"/> formatting.
+        /// </summary>
+        /// <param name="value">Input value to convert. May be <see langword="null"/> for reference and nullable target types.</param>
+        /// <param name="conversionType">Destination type that must be compatible with <see cref="IConvertible"/> conversions.</param>
+        /// <param name="result">Receives the converted value on success or <paramref name="defaultValue"/> when conversion fails.</param>
+        /// <param name="defaultValue">Value assigned to <paramref name="result"/> when conversion cannot be completed; defaults to <see langword="null"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> if conversion succeeds; otherwise <see langword="false"/>, with <paramref name="result"/> set to <paramref name="defaultValue"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown by <see cref="Convert.ChangeType(object, Type)"/> when <paramref name="conversionType"/> is <see langword="null"/>.
+        /// The helper captures the exception and returns <see langword="false"/>.
+        /// </exception>
+        /// <exception cref="InvalidCastException">
+        /// Thrown by the underlying conversion when <paramref name="conversionType"/> does not support <paramref name="value"/>.
+        /// The helper captures the exception and returns <see langword="false"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// Thrown by the underlying conversion when <paramref name="value"/> is a string that is not in a recognized format.
+        /// The helper captures the exception and returns <see langword="false"/>.
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// Thrown by the underlying conversion when <paramref name="value"/> represents a number outside the range of <paramref name="conversionType"/>.
+        /// The helper captures the exception and returns <see langword="false"/>.
+        /// </exception>
         public static bool TryChangeType(this object value, Type conversionType, out object result, object defaultValue = null)
         {
             try
