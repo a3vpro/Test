@@ -14,9 +14,9 @@ using System;
 namespace VisionNet.Core.Patterns
 {
     /// <summary>
-    /// Represents an abstract base class for defining rules that can be evaluated to produce a result.
+    /// Provides a base abstraction for executable rules that yield a strongly typed result populated by derived implementations.
     /// </summary>
-    /// <typeparam name="R">The type of rule result, which must implement the <see cref="IRuleResult"/> interface.</typeparam>
+    /// <typeparam name="R">The concrete <see cref="IRuleResult"/> type that captures the outcome of the rule evaluation.</typeparam>
     public abstract class Rule<R> : IRule<R> where R : IRuleResult, new()
     {
         protected readonly R _ruleResult;
@@ -37,6 +37,10 @@ namespace VisionNet.Core.Patterns
             _ruleResult = new R();
         }
 
+        /// <summary>
+        /// Evaluates the rule using the state supplied by the concrete implementation and prepares the associated result data.
+        /// </summary>
+        /// <returns>The initialized <typeparamref name="R"/> instance that describes the outcome of the evaluation, including any action to execute.</returns>
         public abstract R Evaluate();
     }
 
