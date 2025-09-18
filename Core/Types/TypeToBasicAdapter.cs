@@ -16,6 +16,20 @@ namespace VisionNet.Core.Types
 {
     public class TypeToBasicAdapter : IBidirectionalAdapter<Type, BasicTypeCode>
     {
+        /// <summary>
+        /// Converts the provided runtime type to its corresponding <see cref="BasicTypeCode"/> according to the
+        /// adapter's predefined mappings for Boolean, numeric, string, date, object, and <see cref="DBNull"/> types.
+        /// </summary>
+        /// <param name="value">
+        /// A non-null runtime <see cref="Type"/> assignable from the supported primitive types (bool, integral
+        /// numbers, floating-point numbers, char), <see cref="string"/>, <see cref="DateTime"/>, <see cref="object"/>,
+        /// or <see cref="DBNull"/>.
+        /// </param>
+        /// <returns>
+        /// The mapped <see cref="BasicTypeCode"/> when the input type matches one of the supported categories;
+        /// otherwise <see cref="BasicTypeCode.NotSupported"/>.
+        /// </returns>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="value"/> is <see langword="null"/>.</exception>
         public BasicTypeCode Convert(Type value)
         {
             var result = BasicTypeCode.NotSupported;
@@ -23,10 +37,20 @@ namespace VisionNet.Core.Types
             return result;
         }
 
-        /// <summary> The Convert function converts a Type value to the corresponding type.</summary>
-        /// <param name="value"> What is this for?</param>
-        /// <param name="result"> What is this used for?</param>
-        /// <result =s> A type object.</result =s>
+        /// <summary>
+        /// Converts the provided runtime type to its corresponding <see cref="BasicTypeCode"/> and stores the result
+        /// in the supplied reference parameter.
+        /// </summary>
+        /// <param name="value">
+        /// A non-null runtime <see cref="Type"/> assignable from the supported primitive types (bool, integral
+        /// numbers, floating-point numbers, char), <see cref="string"/>, <see cref="DateTime"/>, <see cref="object"/>,
+        /// or <see cref="DBNull"/>.
+        /// </param>
+        /// <param name="result">
+        /// Receives the mapped <see cref="BasicTypeCode"/> for the provided type; set to
+        /// <see cref="BasicTypeCode.NotSupported"/> when the type is not recognized.
+        /// </param>
+        /// <exception cref="NullReferenceException">Thrown when <paramref name="value"/> is <see langword="null"/>.</exception>
         public void Convert(Type value, ref BasicTypeCode result)
         {
             result = BasicTypeCode.NotSupported;
@@ -67,6 +91,20 @@ namespace VisionNet.Core.Types
                 result = BasicTypeCode.Object;
         }
 
+        /// <summary>
+        /// Converts the provided <see cref="BasicTypeCode"/> to the representative <see cref="Type"/> defined by the
+        /// adapter for Boolean, numeric, string, date, object, and unsupported values.
+        /// </summary>
+        /// <param name="value">
+        /// A <see cref="BasicTypeCode"/> value that must correspond to one of the supported categories such as
+        /// <see cref="BasicTypeCode.IntegerNumber"/>, <see cref="BasicTypeCode.FloatingPointNumber"/>,
+        /// <see cref="BasicTypeCode.String"/>, <see cref="BasicTypeCode.Boolean"/>, <see cref="BasicTypeCode.DateTime"/>,
+        /// <see cref="BasicTypeCode.Object"/>, <see cref="BasicTypeCode.Image"/>, or <see cref="BasicTypeCode.Graphic"/>.
+        /// </param>
+        /// <returns>
+        /// The representative <see cref="Type"/> mapped from the provided basic type code; returns the
+        /// <see cref="Type"/> object for <see cref="DBNull"/> when the value is <see cref="BasicTypeCode.NotSupported"/>.
+        /// </returns>
         public Type Convert(BasicTypeCode value)
         {
             var result = typeof(DBNull);
@@ -74,10 +112,20 @@ namespace VisionNet.Core.Types
             return result;
         }
 
-        /// <summary> The Convert function converts a Type value to the corresponding type.</summary>
-        /// <param name="value"> What is this for?</param>
-        /// <param name="result"> What is this used for?</param>
-        /// <result =s> A type object.</result =s>
+        /// <summary>
+        /// Converts the provided <see cref="BasicTypeCode"/> to the representative <see cref="Type"/> and stores it in
+        /// the supplied reference parameter.
+        /// </summary>
+        /// <param name="value">
+        /// A <see cref="BasicTypeCode"/> value that must correspond to one of the supported categories such as
+        /// <see cref="BasicTypeCode.IntegerNumber"/>, <see cref="BasicTypeCode.FloatingPointNumber"/>,
+        /// <see cref="BasicTypeCode.String"/>, <see cref="BasicTypeCode.Boolean"/>, <see cref="BasicTypeCode.DateTime"/>,
+        /// <see cref="BasicTypeCode.Object"/>, <see cref="BasicTypeCode.Image"/>, or <see cref="BasicTypeCode.Graphic"/>.
+        /// </param>
+        /// <param name="result">
+        /// Receives the representative <see cref="Type"/> mapped from the provided basic type code; set to
+        /// <see cref="DBNull"/> when the value is <see cref="BasicTypeCode.NotSupported"/>.
+        /// </param>
         public void Convert(BasicTypeCode value, ref Type result)
         {
             switch (value)
