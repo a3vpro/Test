@@ -15,6 +15,14 @@ namespace VisionNet.Core.Security
 {
     public static class PasswordEncriptDecriptHelper
     {
+        /// <summary>
+        /// Encrypts the specified secure password using the provided algorithm.
+        /// </summary>
+        /// <param name="source">Secure text that must not be <see langword="null"/> and contains the password to protect.</param>
+        /// <param name="encriptMethod">Encryption algorithm to apply; defaults to <see cref="EncriptMethod.Base64"/>.</param>
+        /// <returns>A Base64-encoded cipher text representation of the original secure password.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="source"/> is <see langword="null"/>.</exception>
+        /// <exception cref="CryptographicException">Thrown when the selected encryption algorithm cannot encrypt the value.</exception>
         // Encripta una cadena
         public static string Encript(this SecureString source, EncriptMethod encriptMethod = EncriptMethod.Base64)
             => new PasswordEncriptDecript().Encript(source, encriptMethod);
