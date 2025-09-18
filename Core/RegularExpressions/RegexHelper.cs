@@ -15,6 +15,12 @@ namespace VisionNet.Core.RegularExpressions
         /// <remarks>Any <see cref="ArgumentException"/> thrown during compilation (including <see cref="ArgumentNullException"/>) is caught, and the method returns <c>false</c> instead of propagating the exception.</remarks>
         public static bool IsValidRegex(string pattern)
         {
+            // GUARD: Ensure the pattern argument is not null before attempting to construct the regex.
+            if (pattern is null)
+            {
+                throw new ArgumentNullException(nameof(pattern));
+            }
+
             try
             {
                 var regex = new Regex(pattern);
