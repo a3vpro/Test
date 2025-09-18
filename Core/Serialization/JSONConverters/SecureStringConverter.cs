@@ -16,17 +16,21 @@ using Newtonsoft.Json;
 
 namespace VisionNet.Core.Serialization
 {
+    /// <summary>
+    /// Provides JSON serialization support for <see cref="SecureString"/> instances by converting
+    /// them to and from string values while preserving their secure storage semantics.
+    /// </summary>
     public class SecureStringConverter : JsonConverter<SecureString>
     {
-        
-        /// <summary> The WriteJson function is used to convert a SecureString object into a string.
-        /// The function does this by first converting the SecureString object into an IntPtr, then 
-        /// converts that IntPtr to a BSTR (Basic String), and finally writes the value of that BSTR as 
-        /// a string.</summary>
-        /// <param name="writer"> The writer to write the json data to.</param>
-        /// <param name="value"> The securestring to be serialized.</param>
-        /// <param name="serializer"> The serializer.</param>
-        /// <returns> A string.</returns>
+
+        /// <summary>
+        /// Overrides <see cref="JsonConverter{T}.WriteJson(JsonWriter, T, JsonSerializer)"/> to write a
+        /// <see cref="SecureString"/> to JSON as an in-memory string value.
+        /// </summary>
+        /// <param name="writer">The JSON writer that receives the serialized characters.</param>
+        /// <param name="value">The secure string to serialize; must not be <c>null</c>.</param>
+        /// <param name="serializer">The serializer that orchestrates the operation.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="writer"/> or <paramref name="value"/> is <c>null</c>.</exception>
         public override void WriteJson(JsonWriter writer, SecureString value, JsonSerializer serializer)
         {
             IntPtr ptr = Marshal.SecureStringToBSTR(value);
@@ -34,18 +38,17 @@ namespace VisionNet.Core.Serialization
             Marshal.ZeroFreeBSTR(ptr);
         }
 
-        /// <summary> The ReadJson function is used to convert a JSON string into a SecureString object.
-        /// The function takes in the following parameters:
-        ///     reader - A JsonReader that reads from the JSON string.
-        ///     objectType - The type of object being deserialized.  In this case, it's always going to be SecureString.
-        ///     existingValue - An existing value of the target type (SecureString).  This parameter will always be null because we're creating new objects and not updating them with this converter class.  
-        ///                    If you wanted to update an existing SecureString, you would need to pass in</summary>
-        /// <param name="reader">  JsonReader that reads from the JSON string.</param>
-        /// <param name="objectType"> The type of object being deserialized.  In this case, it's always going to be SecureString</param>
-        /// <param name="existingValue">An existing value of the target type (SecureString).  This parameter will always be null because we're creating new objects and not updating them with this converter class.</param>
-        /// <param name="hasexistingvalue"></param>
-        /// <param name="serializer">The serializer.</param>
-        /// <returns> A securestring object.</returns>
+        /// <summary>
+        /// Overrides <see cref="JsonConverter{T}.ReadJson(JsonReader, Type, T, bool, JsonSerializer)"/> to
+        /// create a new <see cref="SecureString"/> instance from a JSON string value.
+        /// </summary>
+        /// <param name="reader">The JSON reader that supplies the string characters to convert.</param>
+        /// <param name="objectType">The target type for deserialization; expected to be <see cref="SecureString"/>.</param>
+        /// <param name="existingValue">An existing secure string instance; ignored by this converter.</param>
+        /// <param name="hasExistingValue">Indicates whether <paramref name="existingValue"/> contains a value.</param>
+        /// <param name="serializer">The serializer coordinating the operation.</param>
+        /// <returns>A read-only <see cref="SecureString"/> containing the characters from the JSON value.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="reader"/> is <c>null</c>.</exception>
         public override SecureString ReadJson(JsonReader reader, Type objectType, SecureString existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             string json_val = (string)reader.Value;
