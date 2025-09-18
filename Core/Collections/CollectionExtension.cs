@@ -30,6 +30,12 @@ namespace VisionNet.Core.Collections
         /// <returns>The index of the found item, or -1 if not found.</returns>
         public static int FindIndex<T>(this IEnumerable<T> items, Predicate<T> predicate)
         {
+            // GUARD: Ensure required arguments are provided.
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
             bool found = false;
             int index = 0;
             foreach (var item in items)
@@ -55,6 +61,10 @@ namespace VisionNet.Core.Collections
         /// <exception cref="ArgumentException">Thrown when the number of items in the collection is odd.</exception>
         public static IEnumerable<Tuple<T, T>> GroupInPairs<T>(this IEnumerable<T> items)
         {
+            // GUARD: Ensure required arguments are provided.
+            if (items == null)
+                throw new ArgumentNullException(nameof(items));
+
             if (items.Count() % 2 != 0)
                 throw new ArgumentException("Items count must be an even number");
 
@@ -126,21 +136,35 @@ namespace VisionNet.Core.Collections
         /// <returns>A sequence of sub-sequences where each sub-sequence contains elements that satisfy the given condition.</returns>
         public static IEnumerable<IEnumerable<T>> GroupWhile<T>(this IEnumerable<T> seq, Func<T, T, bool> condition)
         {
-            T prev = seq.First();
-            List<T> list = new List<T>() { prev };
+            // GUARD: Ensure required arguments are provided.
+            if (seq == null)
+                throw new ArgumentNullException(nameof(seq));
+            if (condition == null)
+                throw new ArgumentNullException(nameof(condition));
 
-            foreach (T item in seq.Skip(1))
+            using (IEnumerator<T> enumerator = seq.GetEnumerator())
             {
-                if (condition(prev, item) == false)
-                {
-                    yield return list;
-                    list = new List<T>();
-                }
-                list.Add(item);
-                prev = item;
-            }
+                if (enumerator.MoveNext() == false)
+                    yield break;
 
-            yield return list;
+                T prev = enumerator.Current;
+                List<T> list = new List<T>() { prev };
+
+                while (enumerator.MoveNext())
+                {
+                    T item = enumerator.Current;
+
+                    if (condition(prev, item) == false)
+                    {
+                        yield return list;
+                        list = new List<T>();
+                    }
+                    list.Add(item);
+                    prev = item;
+                }
+
+                yield return list;
+            }
         }
 
         /// <summary>
@@ -184,6 +208,12 @@ namespace VisionNet.Core.Collections
         /// <param name="action">The action to execute on each element.</param>
         public static void ForEach<T>(this IEnumerable<T> enumeration, Action<T> action)
         {
+            // GUARD: Ensure required arguments are provided.
+            if (enumeration == null)
+                throw new ArgumentNullException(nameof(enumeration));
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
             foreach (T item in enumeration)
             {
                 action(item);
