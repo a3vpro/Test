@@ -14,8 +14,17 @@ using System.ComponentModel;
 
 namespace VisionNet.Core.Patterns
 {
+    /// <summary>
+    /// Provides a base implementation of <see cref="INotifyPropertyChanged"/> for objects that expose property change notifications.
+    /// </summary>
     public class ObservableObject : INotifyPropertyChanged, IObservableObject
     {
+        /// <summary>
+        /// Occurs when a property value changes.
+        /// </summary>
+        /// <remarks>
+        /// Subscribe to receive notifications triggered by <see cref="RaisePropertyChanged(string)"/> when a property value is updated.
+        /// </remarks>
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary> The RaisePropertyChanged function is a helper function that raises the PropertyChanged event for the specified property.</summary>
