@@ -52,10 +52,20 @@ namespace VisionNet.Core.Serialization
 
         
         /// <summary>
+        /// This function is called by JsonSerializer when it needs to know if this converter can handle a given type.</summary>
+        /// <param name="objectType"> The type of the object to convert.
+        /// </param>
+        /// <returns> True if the objecttype parameter is of type t or a derived class. otherwise, it returns false.</returns>
         /// Determines whether the converter supports the specified object type.
+        /// Determines whether the converter can convert instances of the provided <paramref name="objectType"/>.
         /// </summary>
         /// <param name="objectType">The object type being queried for converter support.</param>
         /// <returns><see langword="true"/> when the type is <typeparamref name="T"/> or a derived type; otherwise, <see langword="false"/>.</returns>
+        /// <param name="objectType">The runtime type that the serializer is attempting to convert.</param>
+        /// <returns>
+        /// <see langword="true"/> when <typeparamref name="T"/> is assignable from <paramref name="objectType"/>;
+        /// otherwise, <see langword="false"/>.
+        /// </returns>
         public override bool CanConvert(Type objectType)
         {
             return typeof(T).IsAssignableFrom(objectType);
@@ -63,13 +73,24 @@ namespace VisionNet.Core.Serialization
 
 
         /// <summary>
+        /// <param name="reader"> The jsonreader to read from.</param>
+        /// <param name="objectType"> The type of the object.</param>
+        /// <param name="existingValue"> The existing value of object being read.</param>
+        /// <param name="serializer"> The jsonserializer used to deserialize the object.</param>
+        /// <returns> The item object.</returns>
         /// Populates a new <typeparamref name="T"/> instance from the JSON provided by the <paramref name="reader"/> using the configured serializer.
+        /// Creates a new instance of <typeparamref name="T"/> and populates it with values read from the provided JSON reader.
         /// </summary>
         /// <param name="reader">The <see cref="JsonReader"/> positioned at the start of the JSON object to deserialize.</param>
         /// <param name="objectType">The expected object type being created by the serializer.</param>
         /// <param name="existingValue">The current value of the object, which is ignored because the converter creates a new instance.</param>
         /// <param name="serializer">The <see cref="JsonSerializer"/> that supplies settings and populates the instance.</param>
         /// <returns>A fully populated <typeparamref name="T"/> instance created from the JSON content.</returns>
+        /// <param name="reader">The <see cref="JsonReader"/> that provides the JSON payload.</param>
+        /// <param name="objectType">The target CLR type for the deserialization request.</param>
+        /// <param name="existingValue">An existing value supplied by the serializer; ignored by this converter.</param>
+        /// <param name="serializer">The serializer orchestrating the deserialization process.</param>
+        /// <returns>A fully populated <typeparamref name="T"/> instance.</returns>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jo = JObject.Load(reader);
@@ -82,6 +103,8 @@ namespace VisionNet.Core.Serialization
 
         /// <summary>
         /// Gets a value indicating whether the converter participates in writing JSON.
+        /// Gets a value indicating that the converter supports writing so that the serializer will invoke
+        /// <see cref="WriteJson(JsonWriter, object, JsonSerializer)"/> when serializing instances of <typeparamref name="T"/>.
         /// </summary>
         /// <remarks>
         /// Always returns <see langword="true"/> so that <see cref="WriteJson(JsonWriter, object, JsonSerializer)"/> can serialize <typeparamref name="T"/>
@@ -91,11 +114,22 @@ namespace VisionNet.Core.Serialization
 
 
         /// <summary>
+        /// <param name="writer"> The jsonwriter writer is used to write the json data.
+        /// </param>
+        /// <param name="value"> The object to serialize.</param>
+        /// <param name="serializer"> The jsonserializer is used to serialize the object.
+        /// </param>
+        /// <returns> A jsonwriter object.</returns>
         /// Serializes an object to JSON using the supplied <paramref name="serializer"/> and the contract resolver configured for this converter.
+        /// Serializes the supplied <paramref name="value"/> by delegating to the configured serializer while enforcing the
+        /// converter's contract resolver to bypass type converters during serialization.
         /// </summary>
         /// <param name="writer">The <see cref="JsonWriter"/> that receives the serialized JSON content.</param>
         /// <param name="value">The <typeparamref name="T"/> instance to serialize.</param>
         /// <param name="serializer">The <see cref="JsonSerializer"/> responsible for writing JSON data.</param>
+        /// <param name="writer">The <see cref="JsonWriter"/> receiving the JSON output.</param>
+        /// <param name="value">The object instance to serialize.</param>
+        /// <param name="serializer">The serializer orchestrating the serialization process.</param>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             serializer.ContractResolver = resolver;
