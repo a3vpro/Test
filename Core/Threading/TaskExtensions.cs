@@ -8,6 +8,13 @@ namespace VisionNet.Core.Threading
     {
         internal struct VoidTypeStruct { }  // See Footnote #1
 
+        /// <summary>
+        /// Creates a proxy task that completes when the source task finishes or faults with a <see cref="TimeoutException"/> when the timeout interval elapses.
+        /// </summary>
+        /// <param name="task">The task to observe for completion; must not be <see langword="null"/>.</param>
+        /// <param name="millisecondsTimeout">The timeout in milliseconds; use <see cref="Timeout.Infinite"/> to wait indefinitely or <c>0</c> to time out immediately.</param>
+        /// <returns>A task that transitions to the same final state (including cancellation) as <paramref name="task"/> when it completes before the timeout, or faults with <see cref="TimeoutException"/> when the timeout is exceeded.</returns>
+        /// <exception cref="TimeoutException">The returned task faults with this exception when <paramref name="task"/> does not complete within <paramref name="millisecondsTimeout"/>.</exception>
         public static Task TimeoutAfter(this Task task, int millisecondsTimeout)
         {
             // Short-circuit #1: infinite timeout or task already completed
