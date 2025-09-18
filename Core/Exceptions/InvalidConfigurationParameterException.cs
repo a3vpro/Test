@@ -15,45 +15,36 @@ using System.Security;
 
 namespace VisionNet.Core.Exceptions
 {
+    /// <summary>
+    /// Exception that signals a configuration parameter is missing, malformed, or otherwise invalid while configuring VisionNet components.
+    /// </summary>
     public class InvalidConfigurationParameterException : VisionNetException
     {
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException.
+        /// Initializes a new instance of the <see cref="InvalidConfigurationParameterException"/> class for scenarios where a configuration parameter is invalid and no additional context is available.
         /// </summary>
         public InvalidConfigurationParameterException() { }
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException con el mensaje de error especificado.
+        /// Initializes a new instance of the <see cref="InvalidConfigurationParameterException"/> class using the specified error message when a configuration parameter is invalid.
         /// </summary>
-        /// <param name="message">Mensaje que describe el error</param>
+        /// <param name="message">The descriptive error message that explains the invalid configuration parameter.</param>
         public InvalidConfigurationParameterException(string message): base(message) { }
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException con el mensaje de
-        /// error especificado y una referencia a la excepción interna que representa la
-        /// causa de esta excepción.
+        /// Initializes a new instance of the <see cref="InvalidConfigurationParameterException"/> class with a specified error message and an inner exception when a configuration parameter is invalid due to an underlying failure.
         /// </summary>
-        /// <param name="message">Mensaje de error que explica el motivo de la excepción.</param>
-        /// <param name="innerException">
-        /// Inicializa una nueva instancia de la clase System.Exception con el mensaje de
-        /// error especificado y una referencia a la excepción interna que representa la
-        /// causa de esta excepción.
-        /// </param>
+        /// <param name="message">The descriptive error message that explains the invalid configuration parameter.</param>
+        /// <param name="innerException">The underlying exception that provides additional detail about the invalid configuration state.</param>
         public InvalidConfigurationParameterException(string message, Exception innerException): base(message, innerException) { }
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase VisionNet.Devices.InvalidConfigurationParameterException con datos serializados.
+        /// Initializes a new instance of the <see cref="InvalidConfigurationParameterException"/> class with serialized data.
         /// </summary>
-        /// <param name="info">
-        /// System.Runtime.Serialization.SerializationInfo que contiene los datos serializados
-        /// del objeto que hacen referencia a la excepción que se va a producir.
-        /// </param>
-        /// <param name="context">
-        /// System.Runtime.Serialization.StreamingContext que contiene información contextual
-        /// sobre el origen o el destino.
-        /// </param>
-        /// <exception cref="T:System.ArgumentNullException">The info parameter is null.</exception>  
-        /// <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is null or System.Exception.HResult is zero (0).</exception>  
+        /// <param name="info">The serialized object data about the invalid configuration parameter.</param>
+        /// <param name="context">The contextual information about the source or destination of the serialization.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="info"/> is <see langword="null"/>.</exception>
+        /// <exception cref="SerializationException">Thrown when the serialized data is incomplete, corrupted, or missing the required class information.</exception>
         [SecuritySafeCritical]
         protected InvalidConfigurationParameterException(SerializationInfo info, StreamingContext context): base(info, context) { }
     }
