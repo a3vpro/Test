@@ -13,8 +13,18 @@ using VisionNet.Core.Abstractions;
 
 namespace VisionNet.Core.States
 {
+    /// <summary>
+    /// Represents the execution lifecycle validation rules, defining which <see cref="ExecutionStatus"/> values can transition between each other.
+    /// </summary>
     public class ExecutionStatusTransition : StatusValidator<ExecutionStatus>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecutionStatusTransition"/> class with the supported execution status transitions.
+        /// Ensures the workflow can only progress from <see cref="ExecutionStatus.Initial"/> to <see cref="ExecutionStatus.Ready"/>,
+        /// then to <see cref="ExecutionStatus.Executing"/>, and subsequently to <see cref="ExecutionStatus.Finished"/>,
+        /// <see cref="ExecutionStatus.Error"/>, or <see cref="ExecutionStatus.Aborted"/>. Completed, errored, or aborted executions
+        /// may be retried by transitioning back to <see cref="ExecutionStatus.Executing"/>.
+        /// </summary>
         public ExecutionStatusTransition()
         {
             AddTransition(ExecutionStatus.Initial, ExecutionStatus.Ready);
