@@ -18,7 +18,8 @@ using VisionNet.Core.Encoding;
 namespace VisionNet.Core.Security
 {
     /// <summary>
-    /// Provides encryption and decryption helpers for secure strings using either Base64 encoding or TripleDES encryption.
+    /// Provides helpers to encrypt and decrypt passwords backed by <see cref="SecureString"/> values
+    /// using Base64 encoding or a TripleDES cipher in ECB mode.
     /// </summary>
     public class PasswordEncriptDecript
     {
@@ -26,7 +27,8 @@ namespace VisionNet.Core.Security
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PasswordEncriptDecript"/> class with the built-in security key required for TripleDES operations.
+        /// Initializes a new instance of the <see cref="PasswordEncriptDecript"/> class with the
+        /// internal security key used for TripleDES encryption and decryption.
         /// </summary>
         public PasswordEncriptDecript()
         {
@@ -42,8 +44,8 @@ namespace VisionNet.Core.Security
         }
 
         /// <summary>
-        /// Encrypts the provided secure text by either performing Base64 encoding or applying TripleDES encryption in ECB mode with PKCS7 padding.
-        /// </summary>
+        /// Encrypts the provided password using the selected algorithm, returning the result as a
+        /// Base64-encoded string.
         /// <param name="source">Secure string containing the plaintext to encrypt; the instance must be non-null and not disposed.</param>
         /// <param name="encriptMethod">Encryption strategy to apply. Use <see cref="EncriptMethod.Base64"/> for reversible Base64 encoding or <see cref="EncriptMethod.ECB"/> for TripleDES encryption.</param>
         /// <returns>A Base64-encoded string representing the encrypted data.</returns>
