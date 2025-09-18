@@ -255,13 +255,13 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Determines whether the sequence contains an element that is equal to the specified value using the default equality comparer.
+        /// Determines whether the specified sequence contains a particular value by using the default equality comparer.
         /// </summary>
-        /// <typeparam name="T">The element type stored in the sequence.</typeparam>
-        /// <param name="sequence">The sequence to search; must not be <c>null</c>.</param>
-        /// <param name="value">The value to locate using <see cref="EqualityComparer{T}.Default"/>.</param>
-        /// <returns><c>true</c> when at least one element matches <paramref name="value"/>; otherwise, <c>false</c>.</returns>
-        /// <exception cref="NullReferenceException">Thrown when <paramref name="sequence"/> is <c>null</c>, because enumeration cannot be performed.</exception>
+        /// <typeparam name="T">The type of the elements in the sequence.</typeparam>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, a <see cref="NullReferenceException"/> is thrown.</param>
+        /// <param name="value">The value to locate in the sequence. The value may be <see langword="null"/> for reference types.</param>
+        /// <returns><see langword="true"/> if the value is found in the sequence; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="NullReferenceException">The <paramref name="sequence"/> parameter is <see langword="null"/>.</exception>
         public static bool Contains<T>(this IEnumerable<T> sequence, T value)
         {
             IEqualityComparer<T> @default = EqualityComparer<T>.Default;
@@ -277,13 +277,13 @@ namespace VisionNet.Core.Collections
         }
 
         /// <summary>
-        /// Determines whether the non-generic sequence contains an element equal to the specified value using the default object comparer.
+        /// Determines whether the specified non-generic sequence contains a particular value by using <see cref="System.Collections.Generic.Comparer{object}.Default"/>.
         /// </summary>
-        /// <param name="sequence">The sequence to search; must not be <c>null</c>.</param>
-        /// <param name="value">The value to locate using <see cref="Comparer{T}.Default"/> for <see cref="object"/> instances.</param>
-        /// <returns><c>true</c> when an element compares equal to <paramref name="value"/>; otherwise, <c>false</c>.</returns>
-        /// <exception cref="NullReferenceException">Thrown when <paramref name="sequence"/> is <c>null</c>, because enumeration cannot be performed.</exception>
-        /// <exception cref="ArgumentException">Thrown when elements of <paramref name="sequence"/> do not support comparison with <paramref name="value"/> via <see cref="IComparable"/>.</exception>
+        /// <param name="sequence">The sequence to search. If this value is <see langword="null"/>, a <see cref="NullReferenceException"/> is thrown.</param>
+        /// <param name="value">The value to locate in the sequence. The value may be <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if the value is found in the sequence; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="NullReferenceException">The <paramref name="sequence"/> parameter is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The comparer cannot determine an ordering for <paramref name="value"/> and the elements of <paramref name="sequence"/>.</exception>
         public static bool Contains(this IEnumerable sequence, object value)
         {
             Comparer<object> @default = Comparer<object>.Default;
