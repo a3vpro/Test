@@ -22,6 +22,14 @@ using VisionNet.Core.Exceptions;
 
 namespace VisionNet.Core.Tasks
 {
+    /// <summary>
+    /// Provides a long-running service that polls for a condition until it is satisfied, canceled, or times out.
+    /// </summary>
+    /// <remarks>
+    /// The task raises <see cref="Check"/> repeatedly on a background thread until the supplied condition succeeds or the
+    /// configured timeout expires. Consumers can subscribe to <see cref="ExceptionRaised"/> to be notified of unhandled
+    /// exceptions occurring during polling.
+    /// </remarks>
     public class CheckTask : IStartable, IExceptionObservable
     {
         private CancellationTokenSource _cancellation;
@@ -29,22 +37,52 @@ namespace VisionNet.Core.Tasks
         private object _lock = new object();
         private int _taskThreadId;
 
+        /// <summary>
+        /// Gets a value indicating whether the most recent execution of the check succeeded.
+        /// </summary>
         public bool Condition { get; set; }
 
+        /// <summary>
+        /// Gets or sets the current status of the polling operation, including initial, running, canceled, timeout, or completed states.
+        /// </summary>
         public CheckState CheckStatus { get; set; } = CheckState.Initial;
 
+        /// <summary>
+        /// Gets or sets the interval, in milliseconds, between successive condition evaluations when accuracy mode is disabled.
+        /// </summary>
         public int DelayMs { get; set; } = 20;
+        /// <summary>
+        /// Gets or sets a value indicating whether the task should actively wait for precise timing rather than sleeping between checks.
+        /// </summary>
         public bool AccuracyMode { get; set; } = false;
+        /// <summary>
+        /// Gets or sets the maximum duration, in milliseconds, to continue polling before reporting a timeout.
+        /// </summary>
+        /// <remarks>
+        /// Values less than or equal to zero cause the timeout condition to be met after the first evaluation cycle.
+        /// </remarks>
         public long TimeOutMs { get; set; } = 1000;
 
+        /// <summary>
+        /// Gets or sets the priority assigned to the worker thread that performs the polling loop.
+        /// </summary>
         public ThreadPriority Priority { get; set; } = ThreadPriority.Normal;
 
 
         #region IStartable
+        /// <summary>
+        /// Gets the current lifecycle state of the service.
+        /// </summary>
         public ServiceStatus Status { get; protected set; } = ServiceStatus.Stopped;
-        
-        /// <summary> The Start function starts the service.</summary>
-        /// <returns> A task object that represents the asynchronous operation.</returns>
+
+        /// <summary>
+        /// Starts the polling loop on a dedicated worker thread if the task is not already running.
+        /// </summary>
+        /// <remarks>
+        /// The loop executes until <see cref="Condition"/> becomes <see langword="true"/>, <see cref="Stop"/> is invoked, or the
+        /// elapsed time exceeds <see cref="TimeOutMs"/>. The initial delay before the first iteration is <see cref="DelayMs"/>
+        /// when accuracy mode is disabled. When accuracy mode is enabled, the loop busy-waits to maintain the specified interval.
+        /// </remarks>
         public void Start()
         {
             if (Status == ServiceStatus.Stopped)
@@ -60,8 +98,13 @@ namespace VisionNet.Core.Tasks
             }
         }
 
-        /// <summary> The Stop function stops the service.</summary>
-        /// <returns> A task object</returns>
+        /// <summary>
+        /// Requests cancellation of the polling loop and transitions the service to the stopped state.
+        /// </summary>
+        /// <remarks>
+        /// The background thread exits promptly after the current iteration completes. Subsequent calls to <see cref="Start"/>
+        /// can be used to restart the service.
+        /// </remarks>
         public void Stop()
         {
             if (Status == ServiceStatus.Started)
@@ -73,9 +116,16 @@ namespace VisionNet.Core.Tasks
         }
         #endregion
         
-        /// <summary> The Wait function waits for the task to complete execution.
-        /// This function can only be called from a different thread than the one that started the task.</summary>
-        /// <returns> The taskstatus of the task.</returns>
+        /// <summary>
+        /// Blocks the calling thread until the background polling task completes.
+        /// </summary>
+        /// <remarks>
+        /// This method must be called from a thread other than the worker thread that performs the polling loop. If invoked on the
+        /// worker thread, the method raises <see cref="ExceptionRaised"/> with an <see cref="InvalidOperationException"/>.
+        /// </remarks>
+        /// <exception cref="AggregateException">
+        /// Thrown when the background task faults with one or more exceptions other than <see cref="TaskCanceledException"/>.
+        /// </exception>
         public void Wait()
         {
             // Verifica si el hilo actual es el mismo que inició la tarea.
@@ -111,18 +161,12 @@ namespace VisionNet.Core.Tasks
             }
         }
         
-        /// <summary> The CheckTask function is used to check the status of a task.
-        /// &lt;para&gt;The CheckTask function takes three parameters: timeOutMs, delayMs, and accuracyMode.&lt;/para&gt;
-        /// &lt;list type=&quot;bullet&quot;&gt;
-        /// &lt;item&gt;&lt;description&gt;timeOutMs - The amount of time in milliseconds that the task should be allowed to run before it is considered timed out.&lt;/description&gt;&lt;/item&gt;
-        /// &lt;item&gt;&lt;description&gt;delayMs - The amount of time in milliseconds between each check for whether or not the task has completed.&lt;/description&gt;&lt;/item&gt; 
-        /// &lt;/list&gt;</summary>
-        /// <param name="timeOutMs"> The timeout in milliseconds</param>
-        /// <param name="delayMs"> The delay between each check in milliseconds</param>
-        /// <param name="accuracyMode"> If true, the task will wait for the specified time out period before returning false. 
-        /// if false, it will return as soon as possible after checking and finding that the condition is not met. 
-        /// </param>
-        /// <returns> True if the task is completed, otherwise false.</returns>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckTask"/> class with the specified timing settings.
+        /// </summary>
+        /// <param name="timeOutMs">The maximum duration, in milliseconds, to continue polling before reporting a timeout. Values less than or equal to zero cause the timeout condition to be met after the first evaluation cycle.</param>
+        /// <param name="delayMs">The delay, in milliseconds, between evaluations when accuracy mode is disabled.</param>
+        /// <param name="accuracyMode">Indicates whether to perform busy waiting for precise timing (<see langword="true"/>) or use timed waits (<see langword="false"/>).</param>
         public CheckTask(long timeOutMs = 0, int delayMs = 20, bool accuracyMode = false)
         {
             TimeOutMs = timeOutMs;
@@ -199,11 +243,11 @@ namespace VisionNet.Core.Tasks
             }
         }
 
-        /// <summary> The RaiseCheck function is a helper function that raises the Check event.
-        /// It also catches any exceptions thrown by the event handler and passes them to RaiseExceptionNotification.</summary>
-        /// <param name="sender"> </param>
-        /// <param name="e"> What is this parameter used for?</param>
-        /// <returns> The check event.</returns>
+        /// <summary>
+        /// Invokes the <see cref="Check"/> event and routes handler exceptions through <see cref="RaiseExceptionNotification"/>.
+        /// </summary>
+        /// <param name="sender">The source of the invocation.</param>
+        /// <param name="e">The event data containing the condition state.</param>
         private void RaiseCheck(object sender, ConditionEventArgs e)
         {
             try
@@ -215,6 +259,9 @@ namespace VisionNet.Core.Tasks
                 RaiseExceptionNotification(this, new ErrorEventArgs(ex));
             }
         }
+        /// <summary>
+        /// Occurs repeatedly while the task is running to evaluate whether the condition has been satisfied.
+        /// </summary>
         public event EventHandler<ConditionEventArgs> Check;
 
         #region IExceptionObservable
@@ -234,21 +281,20 @@ namespace VisionNet.Core.Tasks
                 ex.LogToConsole(nameof(RaiseExceptionNotification));
             }
         }
+        /// <summary>
+        /// Occurs when the task captures an exception that should be surfaced to subscribers.
+        /// </summary>
         public event EventHandler<ErrorEventArgs> ExceptionRaised;
 
         #endregion
-        /// <summary> The StartNew function is a function that takes in a Func&lt;bool&gt; action, long timeOutMs = 0, int delayMs = 20, bool accuracyMode = false.
-        /// The StartNew function returns an object of type CheckTask. 
-        /// The StartNew function creates a new instance of the CheckTask class and assigns it to the variable checkTask. 
-        /// Then it adds an event handler for the Check event on checkTask which sets e.Condition to whatever value is returned by invoking action (which was passed into this method as an argument). 
-        /// Finally, it calls Start() on checkTask.</summary>
-        /// <param name="action"> The action to be executed.</param>
-        /// <param name="timeOutMs"> The time out in milliseconds. if the condition is not met within this time, the task will be cancelled.</param>
-        /// <param name="delayMs"> Delay between each check in milliseconds</param>
-        /// <param name="accuracyMode"> If true, the task will be executed every &lt;paramref name=&quot;delayms&quot;/&gt; milliseconds.
-        /// otherwise it will be executed after &lt;paramref name=&quot;delayms&quot;/&gt; milliseconds.
-        /// </param>
-        /// <returns> A &lt;see cref=&quot;checktask&quot;/&gt; object.</returns>
+        /// <summary>
+        /// Creates, configures, and starts a new <see cref="CheckTask"/> that polls a delegate until it returns <see langword="true"/>.
+        /// </summary>
+        /// <param name="action">The delegate that evaluates the condition. Returning <see langword="true"/> ends the polling loop.</param>
+        /// <param name="timeOutMs">The maximum polling duration, in milliseconds, before the task reports a timeout. Values less than or equal to zero cause the timeout condition to be met after the first evaluation cycle.</param>
+        /// <param name="delayMs">The delay, in milliseconds, between evaluations when accuracy mode is disabled.</param>
+        /// <param name="accuracyMode">Indicates whether to perform busy waiting for precise timing (<see langword="true"/>) or use timed waits (<see langword="false"/>).</param>
+        /// <returns>The started <see cref="CheckTask"/> instance configured to run the supplied action.</returns>
         public static CheckTask StartNew(Func<bool> action, long timeOutMs = 0, int delayMs = 20, bool accuracyMode = false)
         {
             var checkTask = new CheckTask(timeOutMs, delayMs, accuracyMode);
