@@ -1,0 +1,447 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+
+namespace VisionNet.Vision.Core
+{
+    public class Fixture2D: IFixture2D
+    {
+        // Parámetros de la transformación.
+        public double X { get; private set; }         // Traslación en X.
+        public double Y { get; private set; }         // Traslación en Y.
+        public double Angle { get; private set; }     // Ángulo de rotación (en radianes).
+        public double ScaleX { get; private set; }      // Escala en X.
+        public double ScaleY { get; private set; }      // Escala en Y.
+
+        // Matriz de transformación 3x3 (homogénea).
+        public Matrix<double> TransformMatrix { get; private set; }
+
+        /// <summary>
+        /// Constructor por defecto que inicializa la transformación a 0,0,0,1,1.
+        /// </summary>
+        public Fixture2D() : this(0, 0, 0, 1, 1)
+        {
+        }
+
+        /// <summary>
+        /// Crea una transformación afín en 2D a partir de los parámetros: traslación, rotación y escala.
+        /// La transformación se define de la siguiente forma:
+        /// 
+        /// [ cosθ*scaleX   -sinθ*scaleY   X ]
+        /// [ sinθ*scaleX    cosθ*scaleY   Y ]
+        /// [      0              0        1 ]
+        /// 
+        /// </summary>
+        /// <param name="x">Traslación en X.</param>
+        /// <param name="y">Traslación en Y.</param>
+        /// <param name="angle">Ángulo de rotación en radianes.</param>
+        /// <param name="scaleX">Factor de escala en X.</param>
+        /// <param name="scaleY">Factor de escala en Y.</param>
+        public Fixture2D(double x, double y, double angle, double scaleX = 1.0, double scaleY = 1.0)
+        {
+            X = x;
+            Y = y;
+            Angle = angle;
+            ScaleX = scaleX;
+            ScaleY = scaleY;
+            ComputeMatrix();
+        }
+
+        /// <summary>
+        /// Crea una transformación afín en 2D a partir de los parámetros: traslación, rotación y escala.
+        /// La transformación se define de la siguiente forma:
+        /// 
+        /// [ cosθ*scaleX   -sinθ*scaleY   X ]
+        /// [ sinθ*scaleX    cosθ*scaleY   Y ]
+        /// [      0              0        1 ]
+        /// 
+        /// </summary>
+        /// <param name="translations">Traslaciones en X e Y.</param>
+        /// <param name="angle">Ángulo de rotación en radianes.</param>
+        /// <param name="scaleX">Factor de escala en X.</param>
+        /// <param name="scaleY">Factor de escala en Y.</param>
+        public Fixture2D(PointF translations, double angle, double scaleX = 1.0, double scaleY = 1.0)
+        {
+            X = translations.X;
+            Y = translations.Y;
+            Angle = angle;
+            ScaleX = scaleX;
+            ScaleY = scaleY;
+            ComputeMatrix();
+        }
+
+        /// <summary>
+        /// Constructor privado que permite crear la transformación a partir de una matriz 3x3.
+        /// Se extraen los parámetros de la matriz para completar las propiedades.
+        /// </summary>
+        /// <param name="matrix">Matriz 3x3 que representa la transformación.</param>
+        private Fixture2D(Matrix<double> matrix)
+        {
+            if (matrix.Rows != 3 || matrix.Cols != 3)
+                throw new ArgumentException("La matriz debe ser de 3x3.");
+
+            TransformMatrix = matrix.Clone();
+
+            // Se extraen la traslación (elementos [0,2] y [1,2]).
+            X = TransformMatrix[0, 2];
+            Y = TransformMatrix[1, 2];
+
+            // Se extraen las escalas a partir de la norma de las columnas correspondientes.
+            ScaleX = Math.Sqrt(TransformMatrix[0, 0] * TransformMatrix[0, 0] + TransformMatrix[1, 0] * TransformMatrix[1, 0]);
+            ScaleY = Math.Sqrt(TransformMatrix[0, 1] * TransformMatrix[0, 1] + TransformMatrix[1, 1] * TransformMatrix[1, 1]);
+
+            // Se extrae el ángulo de rotación. Se asume que la columna 0 está asociada a la rotación.
+            if (ScaleX > 1e-12)
+                Angle = Math.Atan2(TransformMatrix[1, 0] / ScaleX, TransformMatrix[0, 0] / ScaleX);
+            else
+                Angle = 0;
+        }
+
+        /// <summary>
+        /// Calcula (o recalcula) la matriz de transformación a partir de los parámetros actuales.
+        /// </summary>
+        private void ComputeMatrix()
+        {
+            TransformMatrix = new Matrix<double>(3, 3);
+
+            double cos = Math.Cos(Angle);
+            double sin = Math.Sin(Angle);
+
+            TransformMatrix[0, 0] = cos * ScaleX;
+            TransformMatrix[0, 1] = -sin * ScaleY;
+            TransformMatrix[0, 2] = X;
+
+            TransformMatrix[1, 0] = sin * ScaleX;
+            TransformMatrix[1, 1] = cos * ScaleY;
+            TransformMatrix[1, 2] = Y;
+
+            TransformMatrix[2, 0] = 0;
+            TransformMatrix[2, 1] = 0;
+            TransformMatrix[2, 2] = 1;
+        }
+
+        /// <summary>
+        /// Extrae la traslación y el ángulo de la transformación.
+        /// </summary>
+        public void GetRotationTranslation(out double x, out double y, out double angle)
+        {
+            x = X;
+            y = Y;
+            angle = Angle;
+        }
+
+        /// <summary>
+        /// Indica si la transformación es la identidad dentro de la tolerancia dada.
+        /// Se considera identidad cuando la traslación es (0,0), el ángulo es 0 (o múltiplo de 2π)
+        /// y las escalas son 1.
+        /// </summary>
+        /// <param name="tolerance">Tolerancia para la comparación.</param>
+        /// <returns>true si es identidad; false en caso contrario.</returns>
+        public bool Identity(double tolerance = 1e-10)
+        {
+            return Math.Abs(X) < tolerance &&
+                   Math.Abs(Y) < tolerance &&
+                   (Math.Abs(Angle) < tolerance || Math.Abs(Angle - 2 * Math.PI) < tolerance) &&
+                   Math.Abs(ScaleX - 1.0) < tolerance &&
+                   Math.Abs(ScaleY - 1.0) < tolerance;
+        }
+
+        /// <summary>
+        /// Retorna una nueva transformación que es la inversa de esta.
+        /// Se utiliza CvInvoke.Invert para invertir la matriz de transformación.
+        /// </summary>
+        /// <returns>Nueva instancia de Fixture2D que es la inversa de la transformación actual.</returns>
+        public IFixture2D Invert()
+        {
+            Matrix<double> inv = new Matrix<double>(3, 3);
+            double det = CvInvoke.Invert(TransformMatrix, inv, DecompMethod.LU);
+            if (Math.Abs(det) < 1e-12)
+                throw new InvalidOperationException("No se puede invertir la transformación: determinante cero.");
+
+            return new Fixture2D(inv);
+        }
+
+        /// <summary>
+        /// Retorna una nueva transformación lineal (sin traslación) que representa la derivada (Jacobian)
+        /// de esta transformación en un punto dado. Como la transformación es afín, la parte lineal es constante.
+        /// </summary>
+        /// <param name="fromX">Coordenada X del punto (no utilizada en el cálculo).</param>
+        /// <param name="fromY">Coordenada Y del punto (no utilizada en el cálculo).</param>
+        /// <returns>Una nueva instancia de Fixture2D que contiene solo la parte lineal.</returns>
+        public IFixture2D LinearTransform(double fromX, double fromY)
+        {
+            // Se copia la parte lineal de la matriz (los dos primeros renglones y columnas)
+            Matrix<double> lin = new Matrix<double>(3, 3);
+            lin[0, 0] = TransformMatrix[0, 0];
+            lin[0, 1] = TransformMatrix[0, 1];
+            lin[0, 2] = 0;
+            lin[1, 0] = TransformMatrix[1, 0];
+            lin[1, 1] = TransformMatrix[1, 1];
+            lin[1, 2] = 0;
+            lin[2, 0] = 0;
+            lin[2, 1] = 0;
+            lin[2, 2] = 1;
+            return new Fixture2D(lin);
+        }
+
+        /// <summary>
+        /// Mapea un ángulo (en radianes) a través de la parte lineal de la transformación.
+        /// Se transforma el vector unitario en la dirección del ángulo y se obtiene el nuevo ángulo.
+        /// </summary>
+        /// <param name="angleIn">Ángulo de entrada en radianes.</param>
+        /// <returns>Ángulo resultante en radianes.</returns>
+        public double MapAngle(double angleIn)
+        {
+            // Vector unitario asociado al ángulo de entrada.
+            double vx = Math.Cos(angleIn);
+            double vy = Math.Sin(angleIn);
+
+            // Se mapea el vector utilizando la parte lineal (sin traslación).
+            MapVector(ref vx, ref vy);
+
+            return Math.Atan2(vy, vx);
+        }
+
+        /// <summary>
+        /// Mapea un punto (x, y) utilizando la matriz de transformación homogénea.
+        /// </summary>
+        /// <param name="x">Coordenada X del punto de entrada.</param>
+        /// <param name="y">Coordenada Y del punto de entrada.</param>
+        /// <param name="mappedX">Coordenada X mapeada (salida).</param>
+        /// <param name="mappedY">Coordenada Y mapeada (salida).</param>
+        public void MapPoint(double x, double y, out double mappedX, out double mappedY)
+        {
+            // Se arma el vector homogéneo: [x, y, 1]^T
+            Matrix<double> pt = new Matrix<double>(3, 1);
+            pt[0, 0] = x;
+            pt[1, 0] = y;
+            pt[2, 0] = 1;
+
+            Matrix<double> res = new Matrix<double>(3, 1);
+            CvInvoke.Gemm(TransformMatrix, pt, 1.0, null, 0.0, res);
+
+            mappedX = res[0, 0];
+            mappedY = res[1, 0];
+        }
+
+        /// <summary>
+        /// Mapea un punto (x, y) utilizando la matriz de transformación homogénea.
+        /// </summary>
+        /// <param name="inputPoint">Punto de entrada.</param>
+        /// <returns>Punto mapeado (salida).</returns>
+        public PointF MapPoint(PointF inputPoint)
+        {
+            // Se arma el vector homogéneo: [x, y, 1]^T
+            Matrix<double> pt = new Matrix<double>(3, 1);
+            pt[0, 0] = inputPoint.X;
+            pt[1, 0] = inputPoint.Y;
+            pt[2, 0] = 1;
+
+            Matrix<double> res = new Matrix<double>(3, 1);
+            CvInvoke.Gemm(TransformMatrix, pt, 1.0, null, 0.0, res);
+
+            return new PointF(Convert.ToSingle(res[0, 0]), Convert.ToSingle(res[1, 0]));
+        }
+
+        /// <summary>
+        /// Mapea una lista de puntos a través de la transformación.
+        /// Se espera que la lista contenga pares (x, y) consecutivos.
+        /// </summary>
+        /// <param name="points">Lista de puntos [x0, y0, x1, y1, ...].</param>
+        /// <returns>Nueva lista con los puntos mapeados.</returns>
+        public List<double> MapPoints(List<double> points)
+        {
+            if (points == null || points.Count % 2 != 0)
+                throw new ArgumentException("La lista de puntos debe contener pares (x, y).");
+
+            List<double> lstMappedPoints = new List<double>(points.Count);
+            for (int i = 0; i < points.Count; i += 2)
+            {
+                double x = points[i];
+                double y = points[i + 1];
+                MapPoint(x, y, out double mx, out double my);
+                lstMappedPoints.Add(mx);
+                lstMappedPoints.Add(my);
+            }
+
+            return lstMappedPoints;
+        }
+
+        /// <summary>
+        /// Mapea una lista de puntos a través de la transformación.
+        /// </summary>
+        /// <param name="points">Lista de puntos [(x0, y0), (x1, y1), ...].</param>
+        /// <returns>Nueva lista con los puntos mapeados.</returns>
+        public List<PointF> MapPoints(List<PointF> points)
+        {
+            if (points == null)
+                throw new ArgumentException("La lista de puntos no debe ser null");
+
+            List<PointF> lstMappedPoints = new List<PointF>(points.Count);
+            for (int i = 0; i < points.Count; i += 2)
+            {
+                double x = points[i].X;
+                double y = points[i].Y;
+                PointF mappedPoint = MapPoint(points[i]);
+                lstMappedPoints.Add(mappedPoint);
+            }
+
+            return lstMappedPoints;
+        }
+
+        /// <summary>
+        /// Mapea un vector (x, y) a través de la parte lineal de la transformación.
+        /// La traslación se ignora.
+        /// </summary>
+        /// <param name="x">Componente X (entrada y salida por referencia).</param>
+        /// <param name="y">Componente Y (entrada y salida por referencia).</param>
+        public void MapVector(ref double x, ref double y)
+        {
+            // Se utiliza la submatriz 2x2 de la transformación (elementos [0,0],[0,1],[1,0],[1,1])
+            double newX = TransformMatrix[0, 0] * x + TransformMatrix[0, 1] * y;
+            double newY = TransformMatrix[1, 0] * x + TransformMatrix[1, 1] * y;
+            x = newX;
+            y = newY;
+        }
+
+        /// <summary>
+        /// Mapea un objeto CoodinateSystem a través de esta transformación.
+        /// El origen se transforma mediante MapPoint y el ángulo se mapea mediante MapAngle.
+        /// </summary>
+        /// <param name="cs">El sistema de coordenadas a mapear.</param>
+        /// <returns>Un nuevo CoodinateSystem con el origen y el ángulo transformados.</returns>
+        public CoodinateSystem MapCoordinateSystem(CoodinateSystem cs)
+        {
+            if (cs == null)
+                throw new ArgumentNullException(nameof(cs));
+
+            // Mapea el origen: se asume que cs.Origin es de tipo PointF (float)
+            this.MapPoint(cs.Origin.X, cs.Origin.Y, out double mappedX, out double mappedY);
+
+            // Mapea el ángulo usando el método MapAngle
+            double mappedAngle = this.MapAngle(cs.Angle);
+
+            // Devuelve un nuevo CoodinateSystem con los valores mapeados
+            return new CoodinateSystem
+            {
+                Origin = new PointF((float)mappedX, (float)mappedY),
+                Angle = mappedAngle
+            };
+        }
+
+        /// <summary>
+        /// Mapea un objeto BoundingBox a través de esta transformación.
+        /// Se transforma el punto de referencia (X, Y) y el ángulo, y se escalan Width y Height.
+        /// </summary>
+        /// <param name="box">Instancia de BoundingBox a transformar.</param>
+        /// <returns>Nuevo BoundingBox con los valores transformados.</returns>
+        public BoundingBox MapBoundingBox(BoundingBox box)
+        {
+            if (box == null)
+                throw new ArgumentNullException(nameof(box));
+
+            // Se mapea el punto de referencia (X, Y)
+            this.MapPoint(box.X, box.Y, out double mappedX, out double mappedY);
+
+            // Se mapea el ángulo de la caja
+            double mappedAngle = this.MapAngle(box.Angle);
+
+            // Se escalan las dimensiones.
+            // Nota: Este escalado es válido si se asume que la caja está definida en el mismo sistema
+            // de coordenadas que la transformación. Si ScaleX y ScaleY son diferentes y la caja tiene rotación,
+            // la transformación real de la caja puede ser más compleja.
+            float newWidth = (float)(box.Width * this.ScaleX);
+            float newHeight = (float)(box.Height * this.ScaleY);
+
+            return new BoundingBox
+            {
+                X = (float)mappedX,
+                Y = (float)mappedY,
+                Width = newWidth,
+                Height = newHeight,
+                Angle = Convert.ToSingle(mappedAngle)
+            };
+        }
+
+        /// <summary>
+        /// Mapea un objeto Polygon a través de esta transformación.
+        /// Cada vértice del polígono se transforma mediante MapPoint.
+        /// </summary>
+        /// <param name="polygon">El polígono a transformar.</param>
+        /// <returns>Un nuevo Polygon con los vértices transformados.</returns>
+        public Polygon MapPolygon(Polygon polygon)
+        {
+            if (polygon == null)
+                throw new ArgumentNullException(nameof(polygon));
+
+            Polygon mappedPoly = new Polygon();
+
+            // Para cada punto del polígono, aplicar la transformación.
+            foreach (PointF pt in polygon.Shape)
+            {
+                MapPoint(pt.X, pt.Y, out double mappedX, out double mappedY);
+                mappedPoly.Add(new PointF((float)mappedX, (float)mappedY));
+            }
+
+            foreach (var child in polygon.Children)
+                mappedPoly.AddChildren(MapPolygon(child));
+
+            return mappedPoly;
+        }
+
+        /// <summary>
+        /// Establece la traslación y la rotación de la transformación.
+        /// Se actualizan los parámetros y se recalcula la matriz de transformación.
+        /// La escala se mantiene sin cambios.
+        /// </summary>
+        /// <param name="x">Nueva traslación en X.</param>
+        /// <param name="y">Nueva traslación en Y.</param>
+        /// <param name="angle">Nuevo ángulo de rotación (en radianes).</param>
+        public void SetRotationTranslation(double x, double y, double angle)
+        {
+            X = x;
+            Y = y;
+            Angle = angle;
+            ComputeMatrix();
+        }
+
+        /// <summary>
+        /// Multiplica la escala actual por los factores indicados y aplica la multiplicación a los valores de traslación.
+        /// Es decir, se actualizan ScaleX, ScaleY, X e Y, y se recalcula la matriz de transformación.
+        /// </summary>
+        /// <param name="factorX">Factor multiplicador para la escala (y traslación) en X.</param>
+        /// <param name="factorY">Factor multiplicador para la escala (y traslación) en Y.</param>
+        public void MultiplyScaleAndTranslation(double factorX, double factorY)
+        {
+            ScaleX *= factorX;
+            ScaleY *= factorY;
+            X *= factorX;
+            Y *= factorY;
+            ComputeMatrix();
+        }
+
+        /// <summary>
+        /// Establece la escala en X e Y a valores específicos.
+        /// Internamente, calcula los factores multiplicadores necesarios a partir de la escala actual
+        /// y utiliza MultiplyScaleAndTranslation para actualizar también los valores de traslación.
+        /// </summary>
+        /// <param name="newScaleX">Nuevo valor para la escala en X.</param>
+        /// <param name="newScaleY">Nuevo valor para la escala en Y.</param>
+        public void SetScale(double newScaleX, double newScaleY)
+        {
+            double factorX = newScaleX / ScaleX;
+            double factorY = newScaleY / ScaleY;
+            MultiplyScaleAndTranslation(factorX, factorY);
+        }
+
+        /// <summary>
+        /// Para facilitar la depuración, se sobreescribe el ToString().
+        /// </summary>
+        public override string ToString()
+        {
+            return $"Fixture2D: Traslación=({X}, {Y}), Ángulo={Angle} rad, Escala=({ScaleX}, {ScaleY})";
+        }
+    }
+}

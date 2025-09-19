@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="VisionNet.Vision.Core.ParameterOptions">
+    <Position X="11.5" Y="1.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgIgACAEgCAIAAQAAAhAAAAAAAEgAAAAAiA=</HashCode>
+      <FileName>Entities\ParameterOptions.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.Parameter">
+    <Position X="11.75" Y="7" Width="2.25" />
+    <Members>
+      <Field Name="_value" Hidden="true" />
+      <Method Name="RaiseExceptionNotification" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Options" Type="VisionNet.Vision.Core.ParameterOptions" FixedToPoint="true">
+      <Path>
+        <Point X="13.25" Y="7" />
+        <Point X="13.25" Y="5.497" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAIAIgACAEACBAAAQAAAgCAAAAAAEgAADAAAA=</HashCode>
+      <FileName>Parametrization\Parameter.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Options" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.OutputParametersCollection">
+    <Position X="4.75" Y="11" Width="2.25" />
+    <InheritanceLine Type="VisionNet.Vision.Core.ParametersCollection" FixedFromPoint="true">
+      <Path>
+        <Point X="7.125" Y="8.314" />
+        <Point X="7.125" Y="10.625" />
+        <Point X="5.875" Y="10.625" />
+        <Point X="5.875" Y="11" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>ABCAAAAEAAAAAYAAACAAAAQAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Parametrization\OutputParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Vision.Core.Entities.VisionFunctionOptions">
+    <Position X="1.25" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAIAAAAAAAAQAAAAAAAAAAIEAAAAAAAA=</HashCode>
+      <FileName>Entities\VisionFunctionOptions.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Parameters" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.InputParametersCollection">
+    <Position X="8.25" Y="11" Width="2.25" />
+    <Members>
+      <Field Name="_immutableParameters" Hidden="true" />
+      <Field Name="_lock" Hidden="true" />
+    </Members>
+    <InheritanceLine Type="VisionNet.Vision.Core.ParametersCollection" FixedFromPoint="true">
+      <Path>
+        <Point X="7.875" Y="8.314" />
+        <Point X="7.875" Y="10.625" />
+        <Point X="9.375" Y="10.625" />
+        <Point X="9.375" Y="11" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAIAgACAAAAAAAAAAAAAAAIIAAAAAAAA=</HashCode>
+      <FileName>Parametrization\InputParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Vision.Core.VisionFunction">
+    <Position X="1.25" Y="6.75" Width="2.25" />
+    <Members>
+      <Field Name="_durationMeter" Hidden="true" />
+      <Field Name="_executionStatusTransition" Hidden="true" />
+      <Field Name="_inputParameters" Hidden="true" />
+      <Field Name="_outputParameters" Hidden="true" />
+      <Field Name="_status" Hidden="true" />
+      <Method Name="LinkParameter" Hidden="true" />
+      <Method Name="RaiseCompleted" Hidden="true" />
+      <Method Name="RaiseConfigured" Hidden="true" />
+      <Method Name="RaiseConfiguredError" Hidden="true" />
+      <Method Name="RaiseError" Hidden="true" />
+      <Method Name="RaiseExceptionNotification" Hidden="true" />
+      <Method Name="RaiseExecutionStatusChanged" Hidden="true" />
+      <Method Name="UnlinkParameter" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>QFAQoAAFE6EgAGUECIDAAAwAAAgCAAAAAQECAABAAAA=</HashCode>
+      <FileName>Abstractions\VisionFunction.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Options" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.ParametersCollection">
+    <Position X="6.5" Y="4" Width="2.25" />
+    <Members>
+      <Field Name="_immutableParameters" Hidden="true" />
+      <Field Name="_lock" Hidden="true" />
+      <Method Name="_notifyConnectionChanged" Hidden="true" />
+      <Field Name="_status" Hidden="true" />
+      <Method Name="Link" Hidden="true" />
+      <Method Name="RaiseExceptionNotification" Hidden="true" />
+      <Method Name="Relink" Hidden="true" />
+      <Method Name="Unlink" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AEIAAAAAICAEAiBgDKAAQAQAABACAAAAAIIEQAFEAAA=</HashCode>
+      <FileName>Parametrization\ParametersCollection.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_parameters" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

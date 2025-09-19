@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net48</TargetFramework>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <Platforms>AnyCPU</Platforms>
+	  <Version>1.7.2</Version>
+	  <AssemblyVersion>1.7.2.0</AssemblyVersion>
+	  <FileVersion>1.7.2.0</FileVersion>
+	  <Company>Sothis | Nunsys</Company>
+	  <Authors>Alvaro Ibañez</Authors>
+	  <Copyright>Copyright © 2023 - Sothis | Nunsys</Copyright>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <PlatformTarget>AnyCPU</PlatformTarget>
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <BaseOutputPath>..\..\..\..\..\build\</BaseOutputPath>
+	  <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	<DefineConstants>DEBUG;TRACE</DefineConstants>
+	<OutputPath>..\..\..\..\..\build\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Lib\**" />
+    <EmbeddedResource Remove="Lib\**" />
+    <None Remove="Lib\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<None Include="..\..\..\VisionNet.Designer.sln.licenseheader" Link="VisionNet.Designer.sln.licenseheader" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\..\core\Application\VisionNet.Application.csproj" />
+	<ProjectReference Include="..\..\Core\Diagnostics\VisionNet.Diagnostics.csproj" />
+	<ProjectReference Include="..\..\Image\Image.VisionPro\VisionNet.Image.VisionPro.csproj" />
+	<ProjectReference Include="..\..\Image\Image\VisionNet.Image.csproj" />
+	<ProjectReference Include="..\Core\VisionNet.Vision.Core.csproj" />
+  </ItemGroup>
+
+</Project>

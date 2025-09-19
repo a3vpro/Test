@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="WRITE INHERITANCE COLUMN">
+    <Position X="21.861" Y="2.194" Height="0.594" Width="2.325" />
+  </Comment>
+  <Comment CommentText="READ INHERITANCE COLUMN">
+    <Position X="15.048" Y="2.069" Height="0.594" Width="2.325" />
+  </Comment>
+  <Comment CommentText="DIRECT INHERITANCE COLUMN">
+    <Position X="8.007" Y="1.942" Height="0.594" Width="2.325" />
+  </Comment>
+  <Class Name="VisionNet.Core.SafeObjects.SafeObjectCollection&lt;TKey, TValue, TType&gt;">
+    <Position X="31" Y="5.75" Width="3.25" />
+    <Members>
+      <Field Name="_values" Hidden="true" />
+      <Method Name="SafeObjectCollection" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.ParametersCollection">
+    <Position X="31" Y="11.75" Width="3.25" />
+    <Members>
+      <Property Name="NotReservedReadonlyParameters" Hidden="true" />
+      <Property Name="ReservedParametersNames" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>iAAIAAAAAQABACIAQCQIAADgAAASAAgAAAEAAACEABA=</HashCode>
+      <FileName>Parametrization\ParametersCollection.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.InputParametersCollection">
+    <Position X="35.75" Y="18.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAQAAAAIgAACAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Parametrization\InputParametersCollection.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.OutputParametersCollection">
+    <Position X="30.75" Y="18.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>ABCAAAAEQAAAAYgAAiAAAEQAAgAAAAAAAAAAAAEACAA=</HashCode>
+      <FileName>Parametrization\OutputParametersCollection.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Core.VisionMessage">
+    <Position X="39.25" Y="8.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAABAEICAAAAAAAABAAACAAAAAAAAICEDAAAACAA=</HashCode>
+      <FileName>Parallelism\Messages\VisionMessage.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="VisionNet.Vision.Core.IOutputParametersCollection">
+    <Position X="7.25" Y="19.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ABCAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Abstractions\IOutputParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Vision.Core.IBasicOutputParametersCollection">
+    <Position X="7.25" Y="17" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAQAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Abstractions\IBasicOutputParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Vision.Core.IParametersCollection">
+    <Position X="8.75" Y="14.5" Width="2.25" />
+    <InheritanceLine Type="VisionNet.Vision.Core.IReadonlyParametersCollection" FixedFromPoint="true">
+      <Path>
+        <Point X="14" Y="11.812" />
+        <Point X="13.625" Y="11.812" />
+        <Point X="13.625" Y="15.277" />
+        <Point X="11" Y="15.277" />
+      </Path>
+    </InheritanceLine>
+    <InheritanceLine Type="VisionNet.Vision.Core.IWriteParametersCollection" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="21.5" Y="11.376" />
+        <Point X="21.125" Y="11.376" />
+        <Point X="21.125" Y="14.845" />
+        <Point X="13.708" Y="14.845" Type="JumpStart" />
+        <Point X="13.542" Y="14.845" Type="JumpEnd" />
+        <Point X="11" Y="14.845" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Abstractions\IParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Vision.Core.IInputParametersCollection">
+    <Position X="10.5" Y="17" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Abstractions\IInputParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Vision.Core.IMessageParametersCollection">
+    <Position X="7.25" Y="22.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAAAACAAAAACAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Abstractions\IMessageParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.IReadOnlyRepository&lt;TEntity, TPrimaryKey&gt;">
+    <Position X="15" Y="3.25" Width="2.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="VisionNet.Core.SafeObjects.IReadonlySafeObjectCollection&lt;TKey, TValue, TType&gt;">
+    <Position X="14.25" Y="7" Width="3.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="VisionNet.Vision.Core.IVisionMessage">
+    <Position X="9.25" Y="25.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAEIAAAAAAAAABAAAAAAAAAAAAIAECAAAACAA=</HashCode>
+      <FileName>Parallelism\Messages\IVisionMessage.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="PrevResults" />
+    </ShowAsAssociation>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.IWriteRepository&lt;TEntity, TPrimaryKey&gt;">
+    <Position X="21.75" Y="3.5" Width="3" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="VisionNet.Core.SafeObjects.IWriteSafeObjectCollection&lt;TKey, TValue, TType&gt;">
+    <Position X="21.5" Y="7" Width="3.5" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="VisionNet.Vision.Core.IReadonlyParametersCollection">
+    <Position X="14" Y="11" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAQAAAAIAACAIAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Abstractions\IReadonlyParametersCollection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Vision.Core.IWriteParametersCollection">
+    <Position X="21.5" Y="10.75" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABA=</HashCode>
+      <FileName>Abstractions\IWriteParametersCollection.cs</FileName>
+      <NewMemberFileName>Abstractions\IReadonlyParametersCollection.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

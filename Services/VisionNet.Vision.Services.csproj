@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>net48</TargetFramework>
+	<Platforms>AnyCPU</Platforms>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Version>1.7.2</Version>
+	<AssemblyVersion>1.7.2.0</AssemblyVersion>
+	<FileVersion>1.7.2.0</FileVersion>
+	<Company>Sothis | Nunsys</Company>
+	<Authors>Alvaro Ibañez</Authors>
+	<Copyright>Copyright © 2023 - Sothis | Nunsys</Copyright>
+	<BaseOutputPath>..\..\..\..\..\build\</BaseOutputPath>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	<DefineConstants>DEBUG;TRACE</DefineConstants>
+	<OutputPath>..\..\..\..\..\build\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<DefineConstants>DEBUG;TRACE</DefineConstants>
+	<OutputPath>..\..\..\..\..\build\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<Compile Remove="Helpers\**" />
+	<EmbeddedResource Remove="Helpers\**" />
+	<None Remove="Helpers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Compile Remove="Device\IVision.cs" />
+	<Compile Remove="Device\IGenericVideoSource.cs" />
+	<Compile Remove="Features\FeatureAdapterPropertyGrid.cs" />
+	<Compile Remove="Features\FeaturePropertyDescriptor.cs" />
+	<Compile Remove="Features\ParameterAdapterPropertyGrid.cs" />
+	<Compile Remove="Features\ParameterPropertyDescriptor.cs" />
+	<Compile Remove="FrameRateMeter.cs" />
+	<Compile Remove="Services\VisionRepository.cs" />
+	<Compile Remove="Services\VisionService_.cs" />
+	<Compile Remove="Statistics\AdvancedStatisticsService.cs" />
+	<Compile Remove="Threading\VisionFunctionTask.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<None Include="..\..\..\VisionNet.Designer.sln.licenseheader" Link="VisionNet.Designer.sln.licenseheader" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\..\Core\Application\VisionNet.Application.csproj" />
+	<ProjectReference Include="..\..\Core\IO\VisionNet.IO.csproj" />
+	<ProjectReference Include="..\..\Core\Diagnostics\VisionNet.Diagnostics.csproj" />
+	<ProjectReference Include="..\Core\VisionNet.Vision.Core.csproj" />
+	<ProjectReference Include="..\Logging\VisionNet.Vision.Logging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Reference Include="System.Design">
+	</Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Threading\" />
+  </ItemGroup>
+
+</Project>

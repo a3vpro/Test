@@ -1,0 +1,108 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <Platforms>AnyCPU</Platforms>
+	  <Version>1.7.2</Version>
+	  <AssemblyVersion>1.7.2.0</AssemblyVersion>
+	  <FileVersion>1.7.2.0</FileVersion>
+	  <Company>Sothis | Nunsys</Company>
+	  <Authors>Alvaro Ibañez</Authors>
+	  <Copyright>Copyright © 2023 - Sothis | Nunsys</Copyright>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <BaseOutputPath>..\..\..\..\..\build\</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	<DefineConstants>DEBUG;TRACE</DefineConstants>
+	<OutputPath>..\..\..\..\..\build\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	<DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Parametrization\Info\**" />
+    <Compile Remove="StatisticsAdvanced\**" />
+    <Compile Remove="Statistics\AdvancedStatistics\**" />
+    <EmbeddedResource Remove="Parametrization\Info\**" />
+    <EmbeddedResource Remove="StatisticsAdvanced\**" />
+    <EmbeddedResource Remove="Statistics\AdvancedStatistics\**" />
+    <None Remove="Parametrization\Info\**" />
+    <None Remove="StatisticsAdvanced\**" />
+    <None Remove="Statistics\AdvancedStatistics\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Compile Remove="Abstractions\ParameterMeaningFactory.cs" />
+	<Compile Remove="Abstractions\ParameterMeaning_.cs" />
+	<Compile Remove="Abstractions\StandardParametersInputs.cs" />
+	<Compile Remove="Abstractions\StandardParametersOutputs.cs" />
+	<Compile Remove="ClassifierInferenceResult.cs" />
+	<Compile Remove="Entities\ImageInfo.cs" />
+	<Compile Remove="Entities\InspectionInfo.cs" />
+	<Compile Remove="Entities\InspectionResult.cs" />
+	<Compile Remove="Entities\ParametersCollection.cs" />
+	<Compile Remove="Entities\ProductInfo.cs" />
+	<Compile Remove="Entities\ProductResult.cs" />
+	<Compile Remove="Entities\VisionValue.cs" />
+	<Compile Remove="Extensions\VisionResultAdapter.cs" />
+	<Compile Remove="InstSegmentationInferenceResults.cs" />
+	<Compile Remove="Parallelism\Messages\VisionMessageAdapter.cs" />
+	<Compile Remove="Parallelism\Messages\VisionMessageJoiner.cs" />
+	<Compile Remove="Parametrization\InputParametersValuesCollection.cs" />
+	<Compile Remove="Parametrization\OutputParameterList.cs" />
+	<Compile Remove="Parametrization\OutputParametersValuesCollection.cs" />
+	<Compile Remove="Parametrization\ParameterData.cs" />
+	<Compile Remove="Parametrization\ParameterList.cs" />
+	<Compile Remove="Parametrization\ParameterList_.cs" />
+	<Compile Remove="Parametrization\ParameterMeaningFactory.cs" />
+	<Compile Remove="Parametrization\ParameterOption.cs" />
+	<Compile Remove="Parametrization\ParametersCollection - Copia.cs" />
+	<Compile Remove="Parametrization\ParametersValuesCollection.cs" />
+	<Compile Remove="Parametrization\StandardParametersInputs.cs" />
+	<Compile Remove="Parametrization\StandardParametersOutputs.cs" />
+	<Compile Remove="Parametrization\VisionFunctionResult.cs" />
+	<Compile Remove="RemoteClientInferenceResult.cs" />
+	<Compile Remove="SelectionCriteria.cs" />
+	<Compile Remove="SelectMode.cs" />
+	<Compile Remove="SingleInstSegmentationInferenceResult.cs" />
+	<Compile Remove="SingleSelectionCriteria.cs" />
+	<Compile Remove="SingleSortCriteria.cs" />
+	<Compile Remove="SortCriteria.cs" />
+	<Compile Remove="SortMode.cs" />
+	<Compile Remove="VisionResults\ValueType.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Fixture\Fixture2D_EMGU_no.cs_" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<None Include="..\..\..\VisionNet.Designer.sln.licenseheader" Link="VisionNet.Designer.sln.licenseheader" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\..\Core\DataBases\VisionNet.DataBases.csproj" />
+	<ProjectReference Include="..\..\Core\Diagnostics\VisionNet.Diagnostics.csproj" />
+	<ProjectReference Include="..\..\Image\Image.Bitmaps\VisionNet.Image.Bitmaps.csproj" />
+	<ProjectReference Include="..\..\Image\Image\VisionNet.Image.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Design">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Design.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>c:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Windows.Forms.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

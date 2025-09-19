@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="VisionNet.Designer.Core.Entities.ImageResult">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAgAAAAAAAAAAAAQAAAAAABAAAAAAAABAAAA=</HashCode>
+      <FileName>VisionResults\Entities\ImageResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Designer.Core.Entities.InspectionResult">
+    <Position X="8.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABCAAAAECAAAAYAAAAAAAAQAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>VisionResults\Entities\InspectionResult.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Measurables" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="VisionNet.Designer.Core.Entities.ParametersResult">
+    <Position X="2.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAIAABAAAAAA=</HashCode>
+      <FileName>VisionResults\Entities\ParametersResult.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Parameters" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="VisionNet.Designer.Core.Entities.ProductResult">
+    <Position X="5.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAIAAAEAAQAA=</HashCode>
+      <FileName>VisionResults\Entities\ProductResult.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Parameters" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="Images" />
+      <Property Name="Inspections" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="VisionNet.Designer.Core.Entities.ValueResult">
+    <Position X="5.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAQAgAAAAAAA=</HashCode>
+      <FileName>VisionResults\Entities\ValueResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

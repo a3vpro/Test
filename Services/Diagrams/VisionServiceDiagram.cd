@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="VisionNet.Vision.Services.VisionService">
+    <Position X="0.75" Y="2.25" Width="2.25" />
+    <Members>
+      <Field Name="_log" Hidden="true" />
+      <Field Name="_optionsRepository" Hidden="true" />
+      <Field Name="_serviceRepository" Hidden="true" />
+      <Field Name="_VisionFactory" Hidden="true" />
+      <Property Name="Default" Hidden="true" />
+      <Property Name="Instance" Hidden="true" />
+      <Method Name="RaiseAnyStateChanged" Hidden="true" />
+      <Method Name="RaiseExceptionNotification" Hidden="true" />
+      <Method Name="VisionService" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAQAAECCAhAWBAAIAAIAQBAAACgAAAYgAAAAFAAAA=</HashCode>
+      <FileName>Services\VisionService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Options" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="_Vision" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.Vision">
+    <Position X="4.75" Y="6" Width="2.25" />
+    <Members>
+      <Method Name="_configure" Hidden="true" />
+      <Field Name="_Vision" Hidden="true" />
+      <Method Name="RaiseConfigured" Hidden="true" />
+      <Method Name="RaiseConfiguredError" Hidden="true" />
+      <Method Name="RaiseExceptionNotification" Hidden="true" />
+      <Method Name="RaiseStateChanged" Hidden="true" />
+      <Method Name="RaiseStatusChanged" Hidden="true" />
+      <Method Name="RaiseTriggerRaised" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+    <ShowAsAssociation>
+      <Property Name="Options" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Vision.VisionOptions">
+    <Position X="10.5" Y="4.5" Width="2.25" />
+    <Members>
+      <Method Name="VisionOptions" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="VisionNet.Vision.Services.VisionOptions" Collapsed="true">
+    <Position X="8" Y="3.25" Width="2" />
+    <Members>
+      <Property Name="Default" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Entities\VisionOptions.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Vision" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Interface Name="VisionNet.Vision.Services.IVisionService" Collapsed="true">
+    <Position X="0.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IVisionService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Vision.IVisionFunction" Collapsed="true">
+    <Position X="5" Y="0.75" Width="2.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
