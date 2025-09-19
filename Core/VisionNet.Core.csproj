@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>    
+    <Platforms>AnyCPU</Platforms>
+    <Version>1.7.2</Version>
+    <AssemblyVersion>1.7.2.0</AssemblyVersion>
+    <FileVersion>1.7.2.0</FileVersion>
+    <Company>Sothis | Nunsys</Company>
+    <Authors>Alvaro Ibañez</Authors>
+    <Copyright>Copyright © 2023 - Sothis | Nunsys</Copyright>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>  
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>..\..\..\..\..\build\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CodeHelpers\**" />
+    <Compile Remove="Dependencies\**" />
+    <Compile Remove="Diagnostics\**" />
+    <Compile Remove="Patterns\Commands\**" />
+    <Compile Remove="Patterns\Factory - Copy\**" />
+    <Compile Remove="Tasks\SynchronizedContext\**" />
+    <Compile Remove="VisionNet.Services\**" />
+    <EmbeddedResource Remove="CodeHelpers\**" />
+    <EmbeddedResource Remove="Dependencies\**" />
+    <EmbeddedResource Remove="Diagnostics\**" />
+    <EmbeddedResource Remove="Patterns\Commands\**" />
+    <EmbeddedResource Remove="Patterns\Factory - Copy\**" />
+    <EmbeddedResource Remove="Tasks\SynchronizedContext\**" />
+    <EmbeddedResource Remove="VisionNet.Services\**" />
+    <None Remove="CodeHelpers\**" />
+    <None Remove="Dependencies\**" />
+    <None Remove="Diagnostics\**" />
+    <None Remove="Patterns\Commands\**" />
+    <None Remove="Patterns\Factory - Copy\**" />
+    <None Remove="Tasks\SynchronizedContext\**" />
+    <None Remove="VisionNet.Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="AI\HDBSCANClustering - Copia.cs" />
+    <Compile Remove="Attributes\LogNameAttribute.cs" />
+    <Compile Remove="Attributes\LogNameAttributeExtension.cs" />
+    <Compile Remove="ByteArrayHelper\ByteArrayFunctions.cs" />
+    <Compile Remove="Events\ErrorArgs.cs" />
+    <Compile Remove="Patterns\Model\ModelBase.cs" />
+    <Compile Remove="Patterns\Model\ModelBaseCollection.cs" />
+    <Compile Remove="Patterns\Observable\BindableBase.cs" />
+    <Compile Remove="Patterns\Observable\IObservableObject.cs" />
+    <Compile Remove="Patterns\Observable\IObservablePropertiesObject.cs" />
+    <Compile Remove="Patterns\Observable\ObservableObject.cs" />
+    <Compile Remove="SafeObjects\GenericSafeObject.cs" />
+    <Compile Remove="SafeObjects\IGenericSafeObject.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="SafeObjects\SafeObject.cs~RFe661b5f.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="DeepCloner" Version="0.10.4" />
+    <PackageReference Include="DynamicData" Version="7.14.2" />
+    <PackageReference Include="HdbscanSharp" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+    <PackageReference Include="Microsoft.ML" Version="4.0.2" />
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Bitwise\" />
+    <Folder Include="Patterns\Model\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\VisionNet.Designer.sln.licenseheader" Link="VisionNet.Designer.sln.licenseheader" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>..\..\..\..\..\build\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

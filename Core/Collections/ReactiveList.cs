@@ -1,0 +1,620 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading;
+using DynamicData;
+
+namespace VisionNet.Core.Collections
+{
+    /// <summary>
+    /// ReactiveList an Observable list with change tracking.
+    /// </summary>
+    /// <typeparam name="T">The Type.</typeparam>
+    public class ReactiveList<T> : IReactiveList<T>
+    {
+        private const string ItemArray = "Item[]";
+        private readonly ReplaySubject<IEnumerable<T>> _added = new ReplaySubject<IEnumerable<T>>(1);
+        private readonly ReplaySubject<IEnumerable<T>> _changed = new ReplaySubject<IEnumerable<T>>(1);
+        private readonly CompositeDisposable _cleanUp = new CompositeDisposable();
+        private readonly ReplaySubject<IEnumerable<T>> _currentItems = new ReplaySubject<IEnumerable<T>>(1);
+        private readonly ReadOnlyObservableCollection<T> _items;
+        private readonly ObservableCollection<T> _itemsAddedoc = new ObservableCollection<T>();
+        private readonly ObservableCollection<T> _itemsChangedoc = new ObservableCollection<T>();
+        private readonly ObservableCollection<T> _itemsRemovedoc = new ObservableCollection<T>();
+        private readonly object _lock = new object();
+        private readonly ReplaySubject<IEnumerable<T>> _removed = new ReplaySubject<IEnumerable<T>>(1);
+        private readonly SourceList<T> _sourceList = new SourceList<T>();
+        private bool _addedRange;
+        private bool _cleared;
+        private bool _replacingAll;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReactiveList{T}"/> class.
+        /// </summary>
+        public ReactiveList()
+        {
+            _items = new ReadOnlyObservableCollection<T>(new ObservableCollection<T>());
+            ItemsAdded = new ReadOnlyObservableCollection<T>(_itemsAddedoc);
+            ItemsRemoved = new ReadOnlyObservableCollection<T>(_itemsRemovedoc);
+            ItemsChanged = new ReadOnlyObservableCollection<T>(_itemsChangedoc);
+            var srcList = _sourceList.Connect();
+
+            // Inicialización de CompositeDisposable
+            _cleanUp.Add(_sourceList);
+            _cleanUp.Add(_added);
+            _cleanUp.Add(_removed);
+            _cleanUp.Add(_changed);
+            _cleanUp.Add(_currentItems);
+            _cleanUp.Add(srcList
+                .ObserveOn(Scheduler.Immediate)
+                .Bind(out _items)
+                .Subscribe());
+            _cleanUp.Add(_sourceList
+                .CountChanged
+                .Select(_ => _sourceList.Items)
+                .ObserveOn(Scheduler.Immediate)
+                .Do(_currentItems.OnNext)
+                .Subscribe());
+            _cleanUp.Add(srcList
+                .WhereReasonsAre(ListChangeReason.Add)
+                .Select(t => t.Select(v => v.Item.Current))
+                .Do(_added.OnNext)
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(v =>
+                {
+                    _itemsAddedoc.Clear();
+                    foreach (var item in v) _itemsAddedoc.Add(item);
+                    _itemsRemovedoc.Clear();
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, v.ToList(), _items.Count - v.Count()));
+                }));
+            _cleanUp.Add(srcList
+                .WhereReasonsAre(ListChangeReason.AddRange)
+                .SelectMany(t => t.Select(v => v.Range))
+                .Do(_added.OnNext)
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(v =>
+                {
+                    _itemsAddedoc.Clear();
+                    foreach (var item in v) _itemsAddedoc.Add(item);
+                    if (!_replacingAll)
+                    {
+                        _itemsRemovedoc.Clear();
+                    }
+                    else
+                    {
+                        _addedRange = true;
+                    }
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                }));
+            _cleanUp.Add(srcList
+                .WhereReasonsAre(ListChangeReason.Remove)
+                .Select(t => t.Select(v => v.Item.Current))
+                .Do(_removed.OnNext)
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(v =>
+                {
+                    _itemsRemovedoc.Clear();
+                    foreach (var item in v) _itemsRemovedoc.Add(item);
+                    _itemsAddedoc.Clear();
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, v.ToList()));
+                }));
+            _cleanUp.Add(srcList
+                .WhereReasonsAre(ListChangeReason.RemoveRange)
+                .SelectMany(t => t.Select(v => v.Range))
+                .Do(_removed.OnNext)
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(v =>
+                {
+                    _itemsRemovedoc.Clear();
+                    foreach (var item in v) _itemsRemovedoc.Add(item);
+                    _itemsAddedoc.Clear();
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, v.ToList()));
+                }));
+            _cleanUp.Add(srcList
+                .WhereReasonsAre(ListChangeReason.Add, ListChangeReason.Remove, ListChangeReason.Replace)
+                .Select(t => t.Select(v => v.Item.Current))
+                .Do(_changed.OnNext)
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(v =>
+                {
+                    _itemsChangedoc.Clear();
+                    foreach (var item in v) _itemsChangedoc.Add(item);
+                }));
+            _cleanUp.Add(srcList
+                .WhereReasonsAre(ListChangeReason.RemoveRange, ListChangeReason.AddRange)
+                .SelectMany(t => t.Select(v => v.Range))
+                .Do(_changed.OnNext)
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(v =>
+                {
+                    _itemsChangedoc.Clear();
+                    foreach (var item in v) _itemsChangedoc.Add(item);
+                }));
+            _cleanUp.Add(srcList
+                .WhereReasonsAre(ListChangeReason.Clear)
+                .SelectMany(t => t.Select(v => v.Range))
+                .ObserveOn(Scheduler.Immediate)
+                .Subscribe(v =>
+                {
+                    if (!_replacingAll)
+                    {
+                        _itemsAddedoc.Clear();
+                    }
+                    _itemsChangedoc.Clear();
+                    foreach (var item in v) _itemsChangedoc.Add(item);
+                    _itemsRemovedoc.Clear();
+                    foreach (var item in v) _itemsRemovedoc.Add(item);
+                    CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                    if (_replacingAll)
+                    {
+                        _cleared = true;
+                    }
+                }));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReactiveList{T}"/> class.
+        /// </summary>
+        /// <param name="items">The items.</param>
+        public ReactiveList(IEnumerable<T> items)
+            : this() => AddRange(items);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReactiveList{T}"/> class.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public ReactiveList(T item)
+            : this() => Add(item);
+
+        /// <inheritdoc/>
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        /// <inheritdoc/>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Gets the added during the last change as an Observeable.
+        /// </summary>
+        /// <value>The added.</value>
+        public IObservable<IEnumerable<T>> Added => _added;
+
+        /// <summary>
+        /// Gets the changed during the last change as an Observeable.
+        /// </summary>
+        /// <value>The changed.</value>
+        public IObservable<IEnumerable<T>> Changed => _changed;
+
+        /// <inheritdoc/>
+        public int Count => _items.Count;
+
+        /// <summary>
+        /// Gets the current items during the last change as an Observeable.
+        /// </summary>
+        /// <value>
+        /// The current items.
+        /// </value>
+        public IObservable<IEnumerable<T>> CurrentItems => _currentItems;
+
+        /// <inheritdoc/>
+        public bool IsDisposed => _cleanUp.IsDisposed;
+
+        /// <inheritdoc/>
+        public bool IsFixedSize => false;
+
+        /// <inheritdoc/>
+        public bool IsReadOnly => false;
+
+        /// <inheritdoc/>
+        public bool IsSynchronized => false;
+
+        /// <summary>
+        /// Gets the items.
+        /// </summary>
+        /// <value>The items.</value>
+        public ReadOnlyObservableCollection<T> Items => _items;
+
+        /// <summary>
+        /// Gets the items added during the last change.
+        /// </summary>
+        /// <value>The items added.</value>
+        public ReadOnlyObservableCollection<T> ItemsAdded { get; }
+
+        /// <summary>
+        /// Gets the items changed during the last change.
+        /// </summary>
+        /// <value>The items changed.</value>
+        public ReadOnlyObservableCollection<T> ItemsChanged { get; }
+
+        /// <summary>
+        /// Gets the items removed during the last change.
+        /// </summary>
+        /// <value>The items removed.</value>
+        public ReadOnlyObservableCollection<T> ItemsRemoved { get; }
+
+        /// <summary>
+        /// Gets the removed items during the last change as an Observable.
+        /// </summary>
+        /// <value>The removed.</value>
+        public IObservable<IEnumerable<T>> Removed => _removed;
+
+        /// <inheritdoc/>
+        public object SyncRoot => this;
+
+        /// <inheritdoc/>
+        object IList.this[int index]
+        {
+            get => _items[index];
+            set
+            {
+                RemoveAt(index);
+                Insert(index, (T)value);
+            }
+        }
+
+        /// <inheritdoc/>
+        public T this[int index]
+        {
+            get => _items[index];
+            set
+            {
+                RemoveAt(index);
+                Insert(index, value);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Add(T item)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.Add(item));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc/>
+        public int Add(object value)
+        {
+            try
+            {
+                Add((T)value);
+            }
+            catch (InvalidCastException)
+            {
+                throw;
+            }
+
+            return Count - 1;
+        }
+
+        /// <inheritdoc/>
+        public void AddRange(IEnumerable<T> items)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.AddRange(items));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        void ICollection<T>.Clear() => Clear();
+
+        /// <inheritdoc/>
+        void IList.Clear() => Clear();
+
+        /// <inheritdoc/>
+        public void Clear()
+        {
+            lock (_lock)
+            {
+                ClearHistoryIfCountIsZero();
+                _sourceList.Edit(l => l.Clear());
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool Contains(T item)
+        {
+            lock (_lock)
+            {
+                return _items.Contains(item);
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool Contains(object value)
+        {
+            if (IsCompatibleObject(value))
+            {
+                return Contains((T)value);
+            }
+
+            return false;
+        }
+
+        /// <inheritdoc/>
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            ((ICollection<T>)_items).CopyTo(array, arrayIndex);
+            OnPropertyChanged(ItemArray);
+        }
+
+        /// <inheritdoc/>
+        public void CopyTo(Array array, int index)
+        {
+            if (array == null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+
+            if (array.Rank != 1)
+            {
+                throw new ArgumentException("Only single dimensional arrays are supported for the requested action.", nameof(array));
+            }
+
+            if (array.GetLowerBound(0) != 0)
+            {
+                throw new ArgumentException("The lower bound of target array must be zero.", nameof(array));
+            }
+
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is less than zero.");
+            }
+
+            if (array.Length - index < Count)
+            {
+                throw new ArgumentException("The number of elements in the source collection is greater than the available space from index to the end of the destination array.", nameof(array));
+            }
+
+            if (array is T[] tArray)
+            {
+                CopyTo(tArray, index);
+            }
+            else if (array is object[] objects)
+            {
+                try
+                {
+                    foreach (var item in this)
+                    {
+                        objects[index++] = item;
+                    }
+                }
+                catch (ArrayTypeMismatchException)
+                {
+                    throw new ArgumentException("Invalid array type.");
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_items).GetEnumerator();
+
+        /// <inheritdoc/>
+        public int IndexOf(T item)
+        {
+            lock (_lock)
+            {
+                return _items.IndexOf(item);
+            }
+        }
+
+        /// <inheritdoc/>
+        public int IndexOf(object value)
+        {
+            if (IsCompatibleObject(value))
+            {
+                return IndexOf((T)value);
+            }
+
+            return -1;
+        }
+
+        /// <inheritdoc/>
+        public void Insert(int index, T item)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.Insert(index, item));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Insert(int index, object value)
+        {
+            try
+            {
+                Insert(index, (T)value);
+            }
+            catch (InvalidCastException)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Inserts the range.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="items">The items.</param>
+        public void InsertRange(int index, IEnumerable<T> items)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.InsertRange(items, index));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool Remove(T item)
+        {
+            lock (_lock)
+            {
+                var removed = false;
+                _sourceList.Edit(l => removed = l.Remove(item));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+                return removed;
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Remove(IEnumerable<T> items)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.Remove(items));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Remove(object value)
+        {
+            if (IsCompatibleObject(value))
+            {
+                Remove((T)value);
+            }
+        }
+
+        /// <inheritdoc/>
+        void IList<T>.RemoveAt(int index) => RemoveAt(index);
+
+        /// <inheritdoc/>
+        void IList.RemoveAt(int index) => RemoveAt(index);
+
+        /// <inheritdoc/>
+        public void RemoveAt(int index)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.RemoveAt(index));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void RemoveRange(int index, int count)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.RemoveRange(index, count));
+                OnPropertyChanged(nameof(Count));
+                OnPropertyChanged(ItemArray);
+            }
+        }
+
+        /// <inheritdoc/>
+        public void ReplaceAll(IEnumerable<T> items)
+        {
+            lock (_lock)
+            {
+                ClearHistoryIfCountIsZero();
+                _sourceList.Edit(l =>
+                {
+                    _replacingAll = true;
+                    l.Clear();
+                    l.AddRange(items);
+                });
+                while (!_cleared && !_addedRange)
+                {
+                    Thread.Sleep(1);
+                }
+
+                _replacingAll = false;
+                _cleared = false;
+                _addedRange = false;
+            }
+        }
+
+        /// <summary>
+        /// Subscribes the specified observer to the CurrentItems.
+        /// </summary>
+        /// <param name="observer">The observer.</param>
+        /// <returns>An IDisposable to release the subscription.</returns>
+        public IDisposable Subscribe(IObserver<IEnumerable<T>> observer) => _currentItems.Subscribe(observer);
+
+        /// <inheritdoc/>
+        public void Update(T item, T newValue)
+        {
+            lock (_lock)
+            {
+                _sourceList.Edit(l => l.Replace(item, newValue));
+            }
+        }
+
+        /// <summary>
+        /// Disposes the specified disposables.
+        /// </summary>
+        /// <param name="disposing">if set to <c>true</c> [disposing].</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _added.Dispose();
+                _changed.Dispose();
+                _removed.Dispose();
+                _currentItems.Dispose();
+                _sourceList.Dispose();
+                _cleanUp.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Raises a PropertyChanged event (per <see cref="INotifyPropertyChanged" />).
+        /// </summary>
+        /// <param name="propertyName">Name of the property.</param>
+        protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        /// <summary>
+        /// Determines whether [is compatible object] [the specified value].
+        /// Non-null values are fine.  Only accept nulls if T is a class or Nullable.
+        /// Note that default(T) is not equal to null for value types except when T is Nullable.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        ///   <c>true</c> if [is compatible object] [the specified value]; otherwise, <c>false</c>.
+        /// </returns>
+        private static bool IsCompatibleObject(object value) =>
+            (value is T) || (value == null && default(T) == null);
+
+        private void ClearHistoryIfCountIsZero()
+        {
+            if (_sourceList.Count == 0)
+            {
+                _itemsAddedoc.Clear();
+                _itemsChangedoc.Clear();
+                _itemsRemovedoc.Clear();
+            }
+        }
+    }
+}

@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="VisionNet.Core.Patterns.ActionRule&lt;R&gt;">
+    <Position X="0.75" Y="10" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\ActionRule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.ActionRule">
+    <Position X="0.75" Y="12.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\ActionRule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.NoRule&lt;R&gt;">
+    <Position X="6.5" Y="10" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\NoRule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.NoRule">
+    <Position X="6.5" Y="12.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\NoRule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.Rule&lt;R&gt;">
+    <Position X="4" Y="5.75" Width="1.75" />
+    <Members>
+      <Field Name="_ruleResult" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\Rule.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.Rule">
+    <Position X="4" Y="8.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\Rule.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.RuleResult">
+    <Position X="8.75" Y="5.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAQAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\RuleResult.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.RuleChain&lt;R&gt;">
+    <Position X="4.75" Y="14.75" Width="1.5" />
+    <Members>
+      <Field Name="_rule" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAABRAgAAAAAAAIAAAAABAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\RulesChain.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.RuleChain">
+    <Position X="4.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\RulesChain.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.RulesEvaluator&lt;R&gt;">
+    <Position X="1.75" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\RulesEvaluator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VisionNet.Core.Patterns.RulesEvaluator">
+    <Position X="1.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\RulesEvaluator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="VisionNet.Core.Patterns.IRule&lt;R&gt;">
+    <Position X="4" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\IRule.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.IRule">
+    <Position X="4" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\IRule.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="VisionNet.Core.Patterns.IRuleResult">
+    <Position X="8.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAQAAAAAAEAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Patterns\Rule\IRuleResult.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
